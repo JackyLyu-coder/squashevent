@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AceCourt 平台运营管理</title>
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: rgba(99,102,241,0.15);
+    --accent: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --bg: #0a0a1a;
+    --bg-2: #11112b;
+    --card: rgba(20,20,50,0.85);
+    --glass: rgba(255,255,255,0.05);
+    --border: rgba(99,102,241,0.25);
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --shadow: 0 8px 32px rgba(99,102,241,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* 左侧导航 */
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: rgba(10,10,30,0.95);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .sidebar-logo {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo h1 {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .sidebar-logo span { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+  .sidebar-admin {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .admin-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .admin-info .name { font-size: 13px; font-weight: 600; }
+  .admin-info .role {
+    font-size: 11px;
+    color: var(--primary);
+    margin-top: 2px;
+  }
+  .nav-list { list-style: none; flex: 1; padding: 12px 0; }
+  .nav-section { padding: 8px 20px 4px; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    user-select: none;
+  }
+  .nav-item:hover { color: var(--text); background: var(--glass); }
+  .nav-item.active {
+    color: #fff;
+    background: var(--primary-light);
+    border-left-color: var(--primary);
+  }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item .tag {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .nav-item .tag.danger { background: var(--danger); }
+  .sidebar-bottom { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-bottom .nav-item { padding: 8px 12px; font-size: 13px; }
+
+  /* 顶部栏 */
+  .topbar {
+    margin-left: 240px;
+    height: 60px;
+    background: rgba(10,10,30,0.8);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 16px;
+    position: fixed;
+    top: 0; right: 0; left: 240px;
+    z-index: 90;
+    backdrop-filter: blur(20px);
+  }
+  .topbar-title { font-size: 15px; font-weight: 600; color: var(--text); margin-right: auto; padding-left: 4px; }
+  .topbar-actions { display: flex; gap: 12px; align-items: center; }
+  .search-box {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    display: flex; align-items: center; gap: 8px;
+    width: 280px;
+  }
+  .search-box input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 13px;
+    width: 100%;
+  }
+  .search-box input::placeholder { color: var(--text-muted); }
+  .topbar-btn {
+    width: 36px; height: 36px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .topbar-btn:hover { background: var(--primary-light); border-color: var(--primary); }
+  .notif-dot {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 8px; height: 8px;
+    background: var(--danger);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+
+  /* 主内容区 */
+  .main {
+    margin-left: 240px;
+    margin-top: 60px;
+    padding: 28px;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* 页面标题 */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .page-title { font-size: 20px; font-weight: 700; }
+  .page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+  /* 通用卡片 */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    backdrop-filter: blur(10px);
+  }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .card-title .icon { font-size: 16px; }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  /* GMV 大卡片 */
+  .gmv-card {
+    background: linear-gradient(135deg, #6366f1, #7c3aed, #a855f7);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .gmv-card::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    top: -120px; right: -80px;
+  }
+  .gmv-card::after {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+    bottom: -80px; left: -60px;
+  }
+  .gmv-label { font-size: 13px; opacity: 0.85; margin-bottom: 8px; }
+  .gmv-value { font-size: 42px; font-weight: 700; position: relative; z-index: 1; }
+  .gmv-fee { font-size: 12px; opacity: 0.7; margin-top: 8px; position: relative; z-index: 1; }
+  .gmv-row {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .gmv-stat { }
+  .gmv-stat-label { font-size: 11px; opacity: 0.7; }
+  .gmv-stat-value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+  /* 统计卡片 */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .stat-card:nth-child(1)::before { background: linear-gradient(90deg, #6366f1, #a855f7); }
+  .stat-card:nth-child(2)::before { background: linear-gradient(90deg, #f59e0b, #f97316); }
+  .stat-card:nth-child(3)::before { background: linear-gradient(90deg, #10b981, #06b6d4); }
+  .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  .stat-card:nth-child(1) .stat-icon { background: rgba(99,102,241,0.15); color: var(--primary); }
+  .stat-card:nth-child(2) .stat-icon { background: rgba(245,158,11,0.15); color: var(--accent); }
+  .stat-card:nth-child(3) .stat-icon { background: rgba(16,185,129,0.15); color: var(--success); }
+  .stat-card:nth-child(4) .stat-icon { background: rgba(236,72,153,0.15); color: #ec4899; }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 700; }
+  .stat-change { font-size: 11px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+  .stat-change.up { color: var(--success); }
+  .stat-change.down { color: var(--danger); }
+
+  /* 两栏布局 */
+  .grid-2 { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* 按钮 */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--primary), #7c3aed); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.4); }
+  .btn-success { background: linear-gradient(135deg, var(--success), #06b6d4); color: #fff; }
+  .btn-success:hover { filter: brightness(1.1); }
+  .btn-outline { background: var(--glass); border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--primary); color: #fff; }
+  .btn-ghost { background: none; color: var(--text-muted); padding: 6px 10px; font-size: 12px; }
+  .btn-ghost:hover { color: var(--text); }
+  .btn-danger { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+  .btn-block { width: 100%; justify-content: center; }
+
+  /* Tab 切换 */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--glass);
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+  .tab-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { background: var(--primary); color: #fff; }
+  .tab-btn .count {
+    background: rgba(255,255,255,0.2);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+  .tab-btn:not(.active) .count { background: var(--border); }
+
+  /* 表格 */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(99,102,241,0.08);
+    vertical-align: middle;
+  }
+  tr:hover td { background: rgba(99,102,241,0.05); }
+
+  /* 状态标签 */
+  .status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .status-pending { background: rgba(245,158,11,0.15); color: var(--accent); }
+  .status-active { background: rgba(16,185,129,0.15); color: var(--success); }
+  .status-draft { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+  .status-passed { background: rgba(99,102,241,0.15); color: var(--primary); }
+  .status-rejected { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .status-certified { background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+  .status-uncertified { background: rgba(245,158,11,0.15); color: var(--accent); border: 1px solid rgba(245,158,11,0.3); }
+
+  /* 标签 */
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    padding: 3px 8px;
+    background: var(--primary-light);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 11px;
+    color: #a5b4fc;
+  }
+
+  /* 进度条 */
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--primary), #a855f7);
+  }
+
+  /* 待办列表 */
+  .todo-list { list-style: none; }
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(99,102,241,0.08);
+  }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .todo-item:nth-child(1) .todo-icon { background: rgba(245,158,11,0.15); color: var(--accent); }
+  .todo-item:nth-child(2) .todo-icon { background: rgba(99,102,241,0.15); color: var(--primary); }
+  .todo-item:nth-child(3) .todo-icon { background: rgba(16,185,129,0.15); color: var(--success); }
+  .todo-item:nth-child(4) .todo-icon { background: rgba(236,72,153,0.15); color: #ec4899; }
+  .todo-content { flex: 1; }
+  .todo-content .title { font-size: 13px; font-weight: 500; }
+  .todo-content .desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .todo-count {
+    font-size: 20px;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: right;
+  }
+  .todo-item:nth-child(1) .todo-count { color: var(--accent); }
+  .todo-item:nth-child(2) .todo-count { color: var(--primary); }
+  .todo-item:nth-child(3) .todo-count { color: var(--success); }
+  .todo-item:nth-child(4) .todo-count { color: #ec4899; }
+
+  /* 主办方卡片 */
+  .org-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .org-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+  }
+  .org-avatar {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .org-info { flex: 1; min-width: 0; }
+  .org-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .org-stats { display: flex; gap: 16px; margin-top: 10px; }
+  .org-stat { }
+  .org-stat-label { font-size: 10px; color: var(--text-muted); }
+  .org-stat-value { font-size: 14px; font-weight: 600; }
+
+  /* 图表区 */
+  .chart-placeholder {
+    height: 200px;
+    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    position: relative;
+    overflow: hidden;
+  }
+  .chart-line {
+    position: absolute;
+    bottom: 30px;
+    left: 20px;
+    right: 20px;
+    height: 80px;
+  }
+  .chart-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--primary);
+  }
+
+  /* 饼图 */
+  .pie-chart {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(
+      var(--primary) 0deg 180deg,
+      var(--accent) 180deg 270deg,
+      var(--success) 270deg 315deg,
+      rgba(255,255,255,0.1) 315deg 360deg
+    );
+    position: relative;
+    margin: 0 auto;
+  }
+  .pie-chart::after {
+    content: '';
+    position: absolute;
+    width: 70px; height: 70px;
+    background: var(--bg);
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .chart-legend { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .legend-item { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+  .legend-label { flex: 1; color: var(--text-muted); }
+  .legend-value { font-weight: 600; }
+
+  /* 提现警示 */
+  .warning-box {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .warning-box .icon { font-size: 18px; color: var(--danger); }
+  .warning-box .text { font-size: 12px; color: var(--danger); }
+  .warning-box .amount { font-weight: 700; font-size: 14px; }
+
+  /* 交易记录 */
+  .tx-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(99,102,241,0.08);
+  }
+  .tx-item:last-child { border-bottom: none; }
+  .tx-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .tx-icon.income { background: rgba(16,185,129,0.15); color: var(--success); }
+  .tx-icon.expense { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .tx-icon.fee { background: rgba(99,102,241,0.15); color: var(--primary); }
+  .tx-info { flex: 1; }
+  .tx-info .title { font-size: 13px; font-weight: 500; }
+  .tx-info .time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .tx-amount { font-size: 14px; font-weight: 600; }
+  .tx-amount.income { color: var(--success); }
+  .tx-amount.expense { color: var(--danger); }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title { font-size: 16px; font-weight: 600; }
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: var(--glass); color: var(--text); }
+  .modal-body { padding: 24px; }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  /* 表单 */
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: all 0.2s;
+  }
+  .form-input:focus { border-color: var(--primary); }
+  .form-input::placeholder { color: var(--text-muted); }
+  textarea.form-input { min-height: 80px; resize: vertical; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    z-index: 300;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--success); }
+  .toast.success .icon { color: var(--success); }
+  .toast.error { border-color: var(--danger); }
+  .toast.error .icon { color: var(--danger); }
+
+  /* 隐藏页面 */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* 响应式 */
+  @media (max-width: 1200px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .org-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 左侧导航 -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>AceCourt</h1>
+    <span>平台运营中心</span>
+  </div>
+  <div class="sidebar-admin">
+    <div class="admin-avatar">管</div>
+    <div class="admin-info">
+      <div class="name">管理员</div>
+      <div class="role">超级管理员</div>
+    </div>
+  </div>
+  <ul class="nav-list">
+    <li class="nav-section">运营管理</li>
+    <li class="nav-item active" onclick="switchPage('overview')">
+      <span class="icon">📊</span> 数据概览
+    </li>
+    <li class="nav-item" onclick="switchPage('audit')">
+      <span class="icon">📋</span> 赛事审核
+      <span class="tag">5</span>
+    </li>
+    <li class="nav-item" onclick="switchPage('organizers')">
+      <span class="icon">🏢</span> 主办方管理
+      <span class="tag">3</span>
+    </li>
+    <li class="nav-section">财务结算</li>
+    <li class="nav-item" onclick="switchPage('finance')">
+      <span class="icon">💰</span> 财务管理
+    </li>
+    <li class="nav-item" onclick="switchPage('withdrawals')">
+      <span class="icon">🏧</span> 提现管理
+      <span class="tag danger">2</span>
+    </li>
+    <li class="nav-section">系统</li>
+    <li class="nav-item" onclick="switchPage('reports')">
+      <span class="icon">📈</span> 数据报表
+    </li>
+    <li class="nav-item" onclick="switchPage('settings')">
+      <span class="icon">⚙️</span> 系统设置
+    </li>
+  </ul>
+  <div class="sidebar-bottom">
+    <div class="nav-item">
+      <span class="icon">👤</span> 退出登录
+    </div>
+  </div>
+</aside>
+
+<!-- 顶部栏 -->
+<header class="topbar">
+  <div class="topbar-title" id="pageTitle">数据概览</div>
+  <div class="topbar-actions">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" placeholder="搜索赛事、主办方、运动员...">
+    </div>
+    <div class="topbar-btn">🔔<span class="notif-dot"></span></div>
+    <div class="topbar-btn">⚙️</div>
+  </div>
+</header>
+
+<!-- 主内容区 -->
+<main class="main">
+
+  <!-- 数据概览页面 -->
+  <div class="page active" id="page-overview">
+    <div class="page-header">
+      <div>
+        <div class="page-title">数据概览</div>
+        <div class="page-subtitle">平台运营核心数据监控</div>
+      </div>
+      <button class="btn btn-outline">📅 2026年4月</button>
+    </div>
+
+    <!-- GMV 大卡片 -->
+    <div class="gmv-card">
+      <div class="gmv-label">平台累计 GMV</div>
+      <div class="gmv-value">¥ 2,847,360</div>
+      <div class="gmv-fee">按 5% 抽成，预计平台收入 ¥142,368</div>
+      <div class="gmv-row">
+        <div class="gmv-stat">
+          <div class="gmv-stat-label">本月 GMV</div>
+          <div class="gmv-stat-value">¥ 486,520</div>
+        </div>
+        <div class="gmv-stat">
+          <div class="gmv-stat-label">本月收入</div>
+          <div class="gmv-stat-value">¥ 24,326</div>
+        </div>
+        <div class="gmv-stat">
+          <div class="gmv-stat-label">主办方数</div>
+          <div class="gmv-stat-value">28</div>
+        </div>
+        <div class="gmv-stat">
+          <div class="gmv-stat-label">赛事数</div>
+          <div class="gmv-stat-value">156</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏢</div>
+        <div class="stat-label">认证主办方</div>
+        <div class="stat-value">25</div>
+        <div class="stat-change up">↑ 3 本月新增</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">上线赛事</div>
+        <div class="stat-value">156</div>
+        <div class="stat-change up">↑ 12 本月新增</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">报名人次</div>
+        <div class="stat-value">8,432</div>
+        <div class="stat-change up">↑ 1,286 本月</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💳</div>
+        <div class="stat-label">待处理提现</div>
+        <div class="stat-value">2</div>
+        <div class="stat-change down">¥ 45,800 待打款</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- 收入趋势 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📈 收入趋势</div>
+          <div class="tabs" style="margin-bottom:0">
+            <button class="tab-btn active">日</button>
+            <button class="tab-btn">周</button>
+            <button class="tab-btn">月</button>
+          </div>
+        </div>
+        <div class="chart-placeholder">
+          <div style="position:relative;z-index:1;text-align:center;">
+            <div style="font-size:28px;font-weight:700;color:var(--primary);margin-bottom:8px;">¥24,326</div>
+            <div style="font-size:12px;color:var(--text-muted);">本月收入</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 待办事项 -->
+      <div class="card">
+        <div class="card-title">📌 待办事项</div>
+        <ul class="todo-list">
+          <li class="todo-item">
+            <div class="todo-icon">📋</div>
+            <div class="todo-content">
+              <div class="title">赛事审核</div>
+              <div class="desc">待审核新提交的赛事</div>
+            </div>
+            <div class="todo-count">5</div>
+          </li>
+          <li class="todo-item">
+            <div class="todo-icon">🏢</div>
+            <div class="todo-content">
+              <div class="title">主办方认证</div>
+              <div class="desc">待审核机构认证申请</div>
+            </div>
+            <div class="todo-count">3</div>
+          </li>
+          <li class="todo-item">
+            <div class="todo-icon">🏧</div>
+            <div class="todo-content">
+              <div class="title">提现审批</div>
+              <div class="desc">待处理提现申请</div>
+            </div>
+            <div class="todo-count">2</div>
+          </li>
+          <li class="todo-item">
+            <div class="todo-icon">📊</div>
+            <div class="todo-content">
+              <div class="title">月度报告</div>
+              <div class="desc">待生成4月数据报表</div>
+            </div>
+            <div class="todo-count">1</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 赛事审核页面 -->
+  <div class="page" id="page-audit">
+    <div class="page-header">
+      <div>
+        <div class="page-title">赛事审核</div>
+        <div class="page-subtitle">审核主办方提交的赛事上线申请</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="filterAudit('pending', this)">
+        待审核 <span class="count">5</span>
+      </button>
+      <button class="tab-btn" onclick="filterAudit('passed', this)">
+        已通过 <span class="count">42</span>
+      </button>
+      <button class="tab-btn" onclick="filterAudit('rejected', this)">
+        已驳回 <span class="count">8</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>赛事名称</th>
+              <th>主办方</th>
+              <th>运动类型</th>
+              <th>报名费</th>
+              <th>报名人数</th>
+              <th>提交时间</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="auditTable">
+            <tr>
+              <td><strong>2026青少年壁球锦标赛</strong></td>
+              <td>北京壁球协会</td>
+              <td><span class="tag">壁球</span></td>
+              <td>¥380</td>
+              <td>86/120</td>
+              <td>04-18 14:30</td>
+              <td><span class="status-tag status-pending">⏳ 待审核</span></td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="showAuditModal('通过', this)">通过</button>
+                <button class="btn btn-danger btn-sm" onclick="showAuditModal('驳回', this)">驳回</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>青少年网球公开赛</strong></td>
+              <td>上海网球俱乐部</td>
+              <td><span class="tag">网球</span></td>
+              <td>¥520</td>
+              <td>45/100</td>
+              <td>04-18 10:15</td>
+              <td><span class="status-tag status-pending">⏳ 待审核</span></td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="showAuditModal('通过', this)">通过</button>
+                <button class="btn btn-danger btn-sm" onclick="showAuditModal('驳回', this)">驳回</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>青少年游泳达标赛</strong></td>
+              <td>广州游泳协会</td>
+              <td><span class="tag">游泳</span></td>
+              <td>¥280</td>
+              <td>120/150</td>
+              <td>04-17 16:45</td>
+              <td><span class="status-tag status-pending">⏳ 待审核</span></td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="showAuditModal('通过', this)">通过</button>
+                <button class="btn btn-danger btn-sm" onclick="showAuditModal('驳回', this)">驳回</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>青少年羽毛球积分赛</strong></td>
+              <td>深圳羽毛球联盟</td>
+              <td><span class="tag">羽毛球</span></td>
+              <td>¥350</td>
+              <td>67/80</td>
+              <td>04-17 09:20</td>
+              <td><span class="status-tag status-pending">⏳ 待审核</span></td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="showAuditModal('通过', this)">通过</button>
+                <button class="btn btn-danger btn-sm" onclick="showAuditModal('驳回', this)">驳回</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>青少年篮球邀请赛</strong></td>
+              <td>成都青少年体育</td>
+              <td><span class="tag">篮球</span></td>
+              <td>¥450</td>
+              <td>32/64</td>
+              <td>04-16 15:00</td>
+              <td><span class="status-tag status-pending">⏳ 待审核</span></td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="showAuditModal('通过', this)">通过</button>
+                <button class="btn btn-danger btn-sm" onclick="showAuditModal('驳回', this)">驳回</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主办方管理页面 -->
+  <div class="page" id="page-organizers">
+    <div class="page-header">
+      <div>
+        <div class="page-title">主办方管理</div>
+        <div class="page-subtitle">管理平台入驻的赛事主办方</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="filterOrg('all', this)">
+        全部 <span class="count">28</span>
+      </button>
+      <button class="tab-btn" onclick="filterOrg('certified', this)">
+        已认证 <span class="count">25</span>
+      </button>
+      <button class="tab-btn" onclick="filterOrg('pending', this)">
+        待认证 <span class="count">3</span>
+      </button>
+    </div>
+
+    <div class="org-grid">
+      <div class="org-card">
+        <div class="org-avatar" style="background:linear-gradient(135deg,#6366f1,#a855f7);">北</div>
+        <div class="org-info">
+          <div class="org-name">
+            北京壁球协会
+            <span class="status-tag status-certified">✓ 已认证</span>
+          </div>
+          <div class="org-stats">
+            <div class="org-stat">
+              <div class="org-stat-label">赛事</div>
+              <div class="org-stat-value">12</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">报名</div>
+              <div class="org-stat-value">856</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">GMV</div>
+              <div class="org-stat-value">¥285K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-avatar" style="background:linear-gradient(135deg,#f59e0b,#f97316);">上</div>
+        <div class="org-info">
+          <div class="org-name">
+            上海网球俱乐部
+            <span class="status-tag status-certified">✓ 已认证</span>
+          </div>
+          <div class="org-stats">
+            <div class="org-stat">
+              <div class="org-stat-label">赛事</div>
+              <div class="org-stat-value">8</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">报名</div>
+              <div class="org-stat-value">624</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">GMV</div>
+              <div class="org-stat-value">¥312K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-avatar" style="background:linear-gradient(135deg,#10b981,#06b6d4);">广</div>
+        <div class="org-info">
+          <div class="org-name">
+            广州游泳协会
+            <span class="status-tag status-certified">✓ 已认证</span>
+          </div>
+          <div class="org-stats">
+            <div class="org-stat">
+              <div class="org-stat-label">赛事</div>
+              <div class="org-stat-value">15</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">报名</div>
+              <div class="org-stat-value">1,245</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">GMV</div>
+              <div class="org-stat-value">¥386K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-avatar" style="background:linear-gradient(135deg,#ec4899,#f472b6);">深</div>
+        <div class="org-info">
+          <div class="org-name">
+            深圳羽毛球联盟
+            <span class="status-tag status-uncertified">⏳ 待认证</span>
+          </div>
+          <div class="org-stats">
+            <div class="org-stat">
+              <div class="org-stat-label">赛事</div>
+              <div class="org-stat-value">3</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">报名</div>
+              <div class="org-stat-value">189</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">GMV</div>
+              <div class="org-stat-value">¥62K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-avatar" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">成</div>
+        <div class="org-info">
+          <div class="org-name">
+            成都青少年体育
+            <span class="status-tag status-uncertified">⏳ 待认证</span>
+          </div>
+          <div class="org-stats">
+            <div class="org-stat">
+              <div class="org-stat-label">赛事</div>
+              <div class="org-stat-value">2</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">报名</div>
+              <div class="org-stat-value">78</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">GMV</div>
+              <div class="org-stat-value">¥28K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-avatar" style="background:linear-gradient(135deg,#14b8a6,#2dd4bf);">武</div>
+        <div class="org-info">
+          <div class="org-name">
+            武汉网球中心
+            <span class="status-tag status-uncertified">⏳ 待认证</span>
+          </div>
+          <div class="org-stats">
+            <div class="org-stat">
+              <div class="org-stat-label">赛事</div>
+              <div class="org-stat-value">1</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">报名</div>
+              <div class="org-stat-value">45</div>
+            </div>
+            <div class="org-stat">
+              <div class="org-stat-label">GMV</div>
+              <div class="org-stat-value">¥18K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 财务管理页面 -->
+  <div class="page" id="page-finance">
+    <div class="page-header">
+      <div>
+        <div class="page-title">财务管理</div>
+        <div class="page-subtitle">平台财务数据与收入分析</div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">平台累计 GMV</div>
+        <div class="stat-value">¥284.7万</div>
+        <div class="stat-change up">↑ 12.4% 较上月</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-label">平台累计收入</div>
+        <div class="stat-value">¥14.2万</div>
+        <div class="stat-change up">↑ 15.8% 较上月</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">已打款金额</div>
+        <div class="stat-value">¥9.8万</div>
+        <div class="stat-change up">↑ 8.2% 较上月</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-label">待打款金额</div>
+        <div class="stat-value">¥4.4万</div>
+        <div class="stat-change down">↓ 2笔待审批</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- 收入占比 -->
+      <div class="card">
+        <div class="card-title">📊 收入来源占比</div>
+        <div style="display:flex;align-items:center;gap:40px;">
+          <div class="pie-chart"></div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--primary)"></div>
+              <div class="legend-label">报名费分成</div>
+              <div class="legend-value">¥98,520</div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--accent)"></div>
+              <div class="legend-label">服务费收入</div>
+              <div class="legend-value">¥28,640</div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--success)"></div>
+              <div class="legend-label">增值服务</div>
+              <div class="legend-value">¥15,208</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 最近交易 -->
+      <div class="card">
+        <div class="card-title">💳 最近交易</div>
+        <div class="tx-item">
+          <div class="tx-icon income">↓</div>
+          <div class="tx-info">
+            <div class="title">赛事报名费分成</div>
+            <div class="time">2026-04-19 15:30 · 北京壁球协会</div>
+          </div>
+          <div class="tx-amount income">+¥1,520</div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-icon income">↓</div>
+          <div class="tx-info">
+            <div class="title">赛事报名费分成</div>
+            <div class="time">2026-04-19 14:15 · 上海网球俱乐部</div>
+          </div>
+          <div class="tx-amount income">+¥2,080</div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-icon fee">◈</div>
+          <div class="tx-info">
+            <div class="title">平台服务费</div>
+            <div class="time">2026-04-19 14:15 · 系统自动</div>
+          </div>
+          <div class="tx-amount" style="color:var(--primary)">¥260</div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-icon expense">↑</div>
+          <div class="tx-info">
+            <div class="title">主办方提现</div>
+            <div class="time">2026-04-19 10:00 · 广州游泳协会</div>
+          </div>
+          <div class="tx-amount expense">-¥15,600</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提现管理页面 -->
+  <div class="page" id="page-withdrawals">
+    <div class="page-header">
+      <div>
+        <div class="page-title">提现管理</div>
+        <div class="page-subtitle">处理主办方的提现申请</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="filterWithdraw('pending', this)">
+        待处理 <span class="count">2</span>
+      </button>
+      <button class="tab-btn" onclick="filterWithdraw('approved', this)">
+        已打款 <span class="count">48</span>
+      </button>
+      <button class="tab-btn" onclick="filterWithdraw('rejected', this)">
+        已拒绝 <span class="count">5</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>申请时间</th>
+              <th>主办方</th>
+              <th>银行</th>
+              <th>账号</th>
+              <th>申请金额</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2026-04-19 10:30</td>
+              <td><strong>北京壁球协会</strong></td>
+              <td>中国工商银行</td>
+              <td>6222 **** 8847</td>
+              <td><strong style="color:var(--danger)">¥15,200</strong></td>
+              <td><span class="status-tag status-pending">⏳ 待处理</span></td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="handleWithdraw('通过', this)">通过</button>
+                <button class="btn btn-danger btn-sm" onclick="handleWithdraw('拒绝', this)">拒绝</button>
+              </td>
+            </tr>
+            <tr>
+              <td>2026-04-18 16:45</td>
+              <td><strong>上海网球俱乐部</strong></td>
+              <td>招商银行</td>
+              <td>6225 **** 2319</td>
+              <td>
+                <strong style="color:var(--danger)">¥30,600</strong>
+                <span style="font-size:10px;background:rgba(239,68,68,0.15);color:var(--danger);padding:2px 6px;border-radius:4px;margin-left:6px;">⚠大额</span>
+              </td>
+              <td><span class="status-tag status-pending">⏳ 待处理</span></td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="handleWithdraw('通过', this)">通过</button>
+                <button class="btn btn-danger btn-sm" onclick="handleWithdraw('拒绝', this)">拒绝</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据报表页面 -->
+  <div class="page" id="page-reports">
+    <div class="page-header">
+      <div>
+        <div class="page-title">数据报表</div>
+        <div class="page-subtitle">平台运营数据分析报告</div>
+      </div>
+      <button class="btn btn-primary">📥 导出报表</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📈 月度数据趋势</div>
+      <div class="chart-placeholder" style="height:280px;">
+        <div style="position:relative;z-index:1;text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--primary);margin-bottom:8px;">数据可视化区域</div>
+          <div style="font-size:12px;color:var(--text-muted);">可接入 ECharts 实现真实图表</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 系统设置页面 -->
+  <div class="page" id="page-settings">
+    <div class="page-header">
+      <div>
+        <div class="page-title">系统设置</div>
+        <div class="page-subtitle">平台配置与权限管理</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">👤 管理员信息</div>
+      <div style="display:flex;align-items:center;gap:20px;padding:16px 0;border-bottom:1px solid var(--border);">
+        <div class="admin-avatar" style="width:64px;height:64px;font-size:24px;">管</div>
+        <div>
+          <div style="font-size:18px;font-weight:600;margin-bottom:4px;">管理员</div>
+          <div style="font-size:13px;color:var(--text-muted);">admin@acecourt.com</div>
+          <div class="status-tag status-active" style="margin-top:8px;width:fit-content;">✓ 超级管理员</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">⚙️ 系统配置</div>
+      <div class="form-group">
+        <label class="form-label">平台服务费比例 (%)</label>
+        <input type="text" class="form-input" value="5">
+      </div>
+      <div class="form-group">
+        <label class="form-label">最低提现金额 (元)</label>
+        <input type="text" class="form-input" value="100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">大额提现警示阈值 (元)</label>
+        <input type="text" class="form-input" value="10000">
+      </div>
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary">保存设置</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- 审核 Modal -->
+<div class="modal-overlay" id="auditModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">赛事审核</div>
+      <div class="modal-close" onclick="closeModal('auditModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">赛事名称</label>
+        <input type="text" class="form-input" value="2026青少年壁球锦标赛" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">主办方</label>
+        <input type="text" class="form-input" value="北京壁球协会" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">报名费</label>
+        <input type="text" class="form-input" value="¥380/人" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label" id="reasonLabel">驳回原因</label>
+        <textarea class="form-input" id="reasonInput" placeholder="请输入驳回原因..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('auditModal')">取消</button>
+      <button class="btn btn-success" id="confirmBtn" onclick="confirmAudit()">确认通过</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="icon">✓</span>
+  <span class="msg">操作成功</span>
+</div>
+
+<script>
+  // 页面切换
+  function switchPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    event.target.closest('.nav-item').classList.add('active');
+    
+    const titles = {
+      overview: '数据概览',
+      audit: '赛事审核',
+      organizers: '主办方管理',
+      finance: '财务管理',
+      withdrawals: '提现管理',
+      reports: '数据报表',
+      settings: '系统设置'
+    };
+    document.getElementById('pageTitle').textContent = titles[page] || page;
+  }
+
+  // Tab 切换
+  document.querySelectorAll('.tabs').forEach(tab => {
+    tab.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+
+  // 审核 Modal
+  let currentAction = '';
+  function showAuditModal(action, btn) {
+    currentAction = action;
+    const row = btn.closest('tr');
+    const name = row.querySelector('td').textContent;
+    
+    document.getElementById('modalTitle').textContent = '赛事审核 - ' + name;
+    document.getElementById('reasonInput').style.display = action === '驳回' ? 'block' : 'none';
+    document.getElementById('reasonLabel').style.display = action === '驳回' ? 'block' : 'none';
+    document.getElementById('confirmBtn').className = action === '通过' ? 'btn btn-success' : 'btn btn-danger';
+    document.getElementById('confirmBtn').textContent = action === '通过' ? '确认通过' : '确认驳回';
+    
+    document.getElementById('auditModal').classList.add('show');
+  }
+
+  function confirmAudit() {
+    if (currentAction === '驳回' && !document.getElementById('reasonInput').value.trim()) {
+      showToast('请输入驳回原因', 'error');
+      return;
+    }
+    closeModal('auditModal');
+    showToast(currentAction === '通过' ? '审核已通过' : '已驳回该赛事');
+  }
+
+  function handleWithdraw(action, btn) {
+    const row = btn.closest('tr');
+    const org = row.querySelector('td:nth-child(2)').textContent;
+    showToast(action === '通过' ? `已通过 ${org} 的提现申请` : `已拒绝 ${org} 的提现申请`);
+    row.remove();
+  }
+
+  function filterAudit(type, btn) {
+    showToast('已切换到 ' + (type === 'pending' ? '待审核' : type === 'passed' ? '已通过' : '已驳回') + ' 列表');
+  }
+
+  function filterOrg(type, btn) {
+    showToast('已切换到 ' + (type === 'all' ? '全部' : type === 'certified' ? '已认证' : '待认证') + ' 主办方');
+  }
+
+  function filterWithdraw(type, btn) {
+    showToast('已切换到 ' + (type === 'pending' ? '待处理' : type === 'approved' ? '已打款' : '已拒绝') + ' 列表');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+  }
+
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.querySelector('.msg').textContent = msg;
+    toast.className = 'toast ' + type;
+    toast.querySelector('.icon').textContent = type === 'success' ? '✓' : '✕';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // 点击 Modal 背景关闭
+  document.getElementById('auditModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal('auditModal');
+  });
+</script>
+</body>
+</html>

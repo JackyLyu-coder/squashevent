@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AceCourt 锐驰 — 三端闭环原型</title>
+<style>
+:root{--primary:#FF6B35;--primary-dark:#e55a28;--secondary:#1A3A6B;--accent:#FFD23F;--success:#22C55E;--danger:#EF4444;--pending:#F59E0B;--bg:#0a0e27;--surface:#111827;--card:#1F2937;--border:#374151;--text:#F9FAFB;--text-muted:#9CA3AF;--glass:rgba(255,255,255,0.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.header{text-align:center;padding:24px 20px 12px;background:linear-gradient(135deg,#0d1229,#111827);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+.header h1{font-size:20px;font-weight:700;background:linear-gradient(135deg,#FF6B35,#FFD23F);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:12px;color:var(--text-muted);margin-bottom:12px}
+.flow-legend{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--text-muted);flex-wrap:wrap}
+.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.legend-dot.a{background:var(--primary)}.legend-dot.b{background:var(--accent)}.legend-dot.c{background:#8B5CF6}
+.flow-arrow{color:var(--text-muted)}
+
+/* GLOBAL STATUS */
+.global-status{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px auto;max-width:1100px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.gs-item{display:flex;flex-direction:column;gap:2px}
+.gs-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.gs-value{font-size:14px;font-weight:600}
+.gs-sep{width:1px;height:30px;background:var(--border)}
+.notif-area{min-height:48px;display:flex;align-items:center;justify-content:center;margin-top:8px}
+.notif{background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;font-size:12px;font-weight:600;padding:8px 16px;border-radius:20px;animation:notifIn .4s ease}
+
+/* PLATFORM */
+.platform{background:linear-gradient(135deg,#1a1040,#0d0d2b);border:1px solid #8B5CF6;border-radius:16px;padding:20px;margin:0 auto;max-width:1100px}
+.platform-title{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.platform-title h2{font-size:15px;font-weight:700;color:#c4b5fd}
+.platform-title span{font-size:10px;padding:2px 8px;border-radius:10px;background:#4c1d95;color:#c4b5fd}
+.platform-devider{height:2px;background:linear-gradient(90deg,#8B5CF6,transparent);margin-bottom:14px;border-radius:2px}
+.platform-content{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* PANEL */
+.panel{border-radius:12px;border:1px solid var(--border);background:var(--card);overflow:hidden;display:flex;flex-direction:column}
+.panel-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.panel-header-left{display:flex;align-items:center;gap:8px}
+.panel-dot{width:8px;height:8px;border-radius:50%}
+.panel-dot.organizer{background:var(--primary)}
+.panel-dot.athlete{background:var(--accent)}
+.panel-dot.admin{background:#8B5CF6}
+.panel-title{font-size:13px;font-weight:700}
+.panel-role{font-size:10px;color:var(--text-muted);padding:2px 7px;border-radius:8px;border:1px solid var(--border)}
+.panel-body{padding:12px;flex:1;min-height:480px}
+
+/* PAGE TABS */
+.page-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tab{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--primary);color:var(--text)}
+.tab.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+.tab.pending-tab.active{background:var(--pending);border-color:var(--pending)}
+.tab.done-tab.active{background:var(--success);border-color:var(--success)}
+
+/* PAGE */
+.page{display:none}
+.page.active{display:block}
+
+/* FORMS */
+.form-group{margin-bottom:10px}
+.form-label{font-size:11px;color:var(--text-muted);margin-bottom:4px;display:block}
+.form-input,.form-select,.form-textarea{width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit;transition:border .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--primary)}
+.form-textarea{resize:vertical;min-height:60px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-hint{font-size:10px;color:var(--text-muted);margin-top:3px}
+
+/* BTN */
+.btn{padding:9px 16px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,107,53,.3)}
+.btn-secondary{background:var(--glass);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--primary)}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-full{width:100%;justify-content:center}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+/* CARD */
+.competition-card{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer;transition:all .2s;background:var(--surface)}
+.competition-card:hover{border-color:var(--primary);transform:translateY(-1px)}
+.competition-card.disabled{opacity:.5;cursor:not-allowed;pointer-events:none}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.card-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.card-meta{font-size:11px;color:var(--text-muted);display:flex;gap:8px;flex-wrap:wrap}
+.card-status{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700}
+.card-status.draft{background:rgba(245,158,11,.2);color:var(--pending)}
+.card-status.pending{background:rgba(245,158,11,.3);color:var(--pending);border:1px solid var(--pending);animation:pulse 2s infinite}
+.card-status.open{background:rgba(34,197,94,.2);color:var(--success)}
+.card-status.closed{background:rgba(156,163,175,.2);color:#9CA3AF}
+.card-status.approved{background:rgba(34,197,94,.2);color:var(--success)}
+.card-status.rejected{background:rgba(239,68,68,.2);color:var(--danger)}
+.card-fee{font-size:13px;font-weight:700;color:var(--primary);margin-top:6px}
+.card-actions{margin-top:8px;display:flex;gap:6px}
+
+/* LIST TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{text-align:left;padding:7px 8px;background:var(--surface);color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+.data-table td{padding:8px;border-bottom:1px solid rgba(55,65,81,.5)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+
+/* STATS GRID */
+.stats-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;display:grid}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+.stat-value{font-size:20px;font-weight:700}
+.stat-label{font-size:10px;color:var(--text-muted);margin-top:2px}
+
+/* WALLET */
+.wallet-card{background:linear-gradient(135deg,var(--secondary),#0f2557);border-radius:12px;padding:14px;margin-bottom:12px}
+.wallet-balance{font-size:26px;font-weight:700;margin-bottom:2px}
+.wallet-label{font-size:11px;color:rgba(255,255,255,.6)}
+.wallet-detail{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:rgba(255,255,255,.7)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;animation:slideUp .3s}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:20px}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.modal-sm{max-width:360px}
+
+/* QR */
+.qr-container{text-align:center;padding:20px;background:#fff;border-radius:12px;margin:10px auto;width:160px;height:160px;display:flex;align-items:center;justify-content:center}
+
+/* PROCESS */
+.process-steps{display:flex;align-items:center;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:4px}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--text-muted);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-num.active{background:var(--primary);color:#fff}
+.step-num.done{background:var(--success);color:#fff}
+.step-label{font-size:10px;color:var(--text-muted);white-space:nowrap}
+.step-arrow{color:var(--text-muted);font-size:10px}
+
+/* ANIMATIONS */
+@keyframes notifIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:32px 16px;color:var(--text-muted);font-size:13px}
+.empty-icon{font-size:32px;margin-bottom:8px;opacity:.4}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:12px 0}
+
+/* INFO ROW */
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(55,65,81,.5);font-size:12px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--text-muted)}
+.info-value{font-weight:600}
+
+/* BADGE */
+.badge{padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700}
+.badge-green{background:rgba(34,197,94,.2);color:var(--success)}
+.badge-orange{background:rgba(245,158,11,.2);color:var(--pending)}
+.badge-red{background:rgba(239,68,68,.2);color:var(--danger)}
+.badge-purple{background:rgba(139,92,246,.2);color:#a78bfa}
+
+/* REVIEW CARD */
+.review-card{border:1px solid var(--pending);border-radius:10px;padding:12px;margin-bottom:10px;background:rgba(245,158,11,.05)}
+.review-header{display:flex;justify-content:space-between;margin-bottom:6px}
+.review-name{font-size:13px;font-weight:600}
+.review-actions{display:flex;gap:6px;margin-top:8px}
+
+/* CASHFLOW */
+.cashflow{display:flex;flex-direction:column;gap:4px;margin:10px 0}
+.cash-node{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.cash-from{color:var(--text-muted);font-size:11px}
+.cash-amount{font-weight:700;font-size:13px}
+.cash-amount.positive{color:var(--success)}
+.cash-amount.negative{color:var(--danger)}
+.cash-amount.fee{color:var(--pending)}
+
+/* NOTICE BOX */
+.notice-box{background:rgba(245,158,11,.1);border:1px solid var(--pending);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--pending);margin-bottom:10px}
+
+/* GUIDE */
+.guide{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px}
+.guide-title{font-size:12px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.guide-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;color:var(--text-muted)}
+.guide-item span:first-child{font-weight:700;color:var(--primary)}
+
+/* TIMELINE */
+.timeline{margin-top:12px}
+.timeline-item{display:flex;gap:10px;font-size:11px;color:var(--text-muted);padding-bottom:8px;position:relative}
+.timeline-item::before{content:'';position:absolute;left:5px;top:14px;bottom:-8px;width:1px;background:var(--border)}
+.timeline-item:last-child::before{display:none}
+.timeline-dot{width:11px;height:11px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:3px;z-index:1}
+.timeline-dot.active{background:var(--primary)}
+.timeline-dot.done{background:var(--success)}
+
+/* RESULT */
+.result-box{border-radius:10px;padding:16px;text-align:center;margin-top:12px}
+.result-box.success{background:rgba(34,197,94,.1);border:1px solid var(--success)}
+.result-box.fail{background:rgba(239,68,68,.1);border:1px solid var(--danger)}
+.result-icon{font-size:36px;margin-bottom:6px}
+.result-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.result-desc{font-size:12px;color:var(--text-muted)}
+
+/* FEEDBACK */
+.feedback-row{display:flex;gap:8px;margin-bottom:10px}
+.feedback-row .form-input{flex:1}
+
+@media(max-width:768px){
+  .platform-content{grid-template-columns:1fr}
+  .global-status{position:static;margin:10px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <svg class="logo-svg" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="20" fill="#FF6B35"/>
+      <path d="M12 28L20 10L28 28" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M14 22H26" stroke="#fff" stroke-width="2"/>
+      <circle cx="20" cy="9" r="2" fill="#FFD23F"/>
+    </svg>
+    <h1>AceCourt 锐驰</h1>
+  </div>
+  <p>三端闭环原型验证 — 主办方创赛 · 运动员报名 · 平台审核</p>
+  <div class="flow-legend">
+    <span class="legend-dot a"></span> 主办方
+    <span class="flow-arrow">→</span>
+    <span class="legend-dot b"></span> 运动员
+    <span class="flow-arrow">→</span>
+    <span class="legend-dot c"></span> 平台运营
+    <span class="flow-arrow">→</span>
+    <span style="color:var(--success)">✓ 闭环完成</span>
+  </div>
+</div>
+
+<!-- GLOBAL STATUS -->
+<div class="global-status">
+  <div class="gs-item">
+    <div class="gs-label">赛事状态</div>
+    <div class="gs-value" id="gs-competition">—</div>
+  </div>
+  <div class="gs-sep"></div>
+  <div class="gs-item">
+    <div class="gs-label">报名数</div>
+    <div class="gs-value" id="gs-registrations">0 / 50</div>
+  </div>
+  <div class="gs-sep"></div>
+  <div class="gs-item">
+    <div class="gs-label">收入</div>
+    <div class="gs-value" style="color:var(--success)" id="gs-income">¥0.00</div>
+  </div>
+  <div class="gs-sep"></div>
+  <div class="gs-item">
+    <div class="gs-label">平台抽成</div>
+    <div class="gs-value" style="color:var(--pending)" id="gs-fee">¥0.00</div>
+  </div>
+  <div class="gs-sep"></div>
+  <div class="gs-item">
+    <div class="gs-label">主办方到账</div>
+    <div class="gs-value" style="color:var(--primary)" id="gs-settlement">¥0.00</div>
+  </div>
+</div>
+
+<div class="notif-area" id="notif-area"></div>
+
+<!-- THREE-PANEL PLATFORM -->
+<div class="platform">
+  <div class="platform-title">
+    <h2>🔗 三端联动</h2>
+    <span>实时同步</span>
+  </div>
+  <div class="platform-devider"></div>
+  <div class="platform-content">
+
+    <!-- ============ PANEL A: 主办方 ============ -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-dot organizer"></div>
+          <span class="panel-title">🏢 主办方端</span>
+        </div>
+        <span class="panel-role">锐驰壁球俱乐部</span>
+      </div>
+      <div class="panel-body">
+        <div class="page-tabs">
+          <button class="tab active" onclick="switchTab('a','home')">首页</button>
+          <button class="tab" onclick="switchTab('a','create')">创赛</button>
+          <button class="tab" onclick="switchTab('a','list')">名单</button>
+          <button class="tab" onclick="switchTab('a','wallet')">钱包</button>
+        </div>
+
+        <!-- A: 首页 -->
+        <div id="a-home" class="page active">
+          <div class="guide">
+            <div class="guide-title">💡 操作指南</div>
+            <div class="guide-item"><span>1</span> 创建赛事（发布 → 等平台审核）</div>
+            <div class="guide-item"><span>2</span> 审核通过后，生成报名二维码</div>
+            <div class="guide-item"><span>3</span> 等待运动员报名收款</div>
+            <div class="guide-item"><span>4</span> 提现到银行卡</div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--primary)" id="a-stat-events">0</div>
+              <div class="stat-label">赛事数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--accent)" id="a-stat-registrations">0</div>
+              <div class="stat-label">总报名</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--success)" id="a-stat-income">¥0</div>
+              <div class="stat-label">累计收入</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--text)" id="a-stat-balance">¥0</div>
+              <div class="stat-label">可用余额</div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="switchTab('a','create')">
+            + 创建新赛事
+          </button>
+          <div class="timeline" id="a-timeline">
+            <div class="timeline-item"><div class="timeline-dot active"></div><span>完成注册认证</span></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><span>创建赛事</span></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><span>平台审核通过</span></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><span>运动员报名</span></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><span>申请提现</span></div>
+          </div>
+        </div>
+
+        <!-- A: 创建赛事 -->
+        <div id="a-create" class="page">
+          <div class="form-group">
+            <label class="form-label">赛事名称 *</label>
+            <input class="form-input" id="create-title" value="2026 青少年壁球锦标赛" placeholder="请输入赛事名称">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">开始日期</label>
+              <input class="form-input" type="date" id="create-start" value="2026-05-15">
+            </div>
+            <div class="form-group">
+              <label class="form-label">报名截止</label>
+              <input class="form-input" type="date" id="create-end" value="2026-05-10">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">运动类型</label>
+              <select class="form-select" id="create-sport">
+                <option>壁球</option><option>篮球</option><option>游泳</option><option>乒乓球</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">报名名额</label>
+              <input class="form-input" type="number" id="create-cap" value="50" min="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">报名费（元）</label>
+            <input class="form-input" type="number" id="create-fee" value="199" min="0" step="0.01">
+            <div class="form-hint">平台将收取 5% 技术服务费（VIP免抽成）</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">赛事地点</label>
+            <input class="form-input" id="create-location" value="广州市天河体育中心壁球馆" placeholder="场馆地址">
+          </div>
+          <div class="form-group">
+            <label class="form-label">赛事描述</label>
+            <textarea class="form-textarea" id="create-desc" placeholder="简要描述赛事内容、规则等">面向8-18岁青少年的壁球赛事，设U10/U14/U18三个组别，前三名获荣誉证书。</textarea>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="createCompetition()" id="create-btn">
+            🚀 发布赛事（待审核）
+          </button>
+          <div class="notice-box" style="margin-top:8px">
+            ⚠️ 赛事需平台审核通过后才能开放报名
+          </div>
+        </div>
+
+        <!-- A: 报名名单 -->
+        <div id="a-list" class="page">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span style="font-size:12px;color:var(--text-muted)">报名人数：<strong id="a-list-count" style="color:var(--text)">0</strong> 人</span>
+            <button class="btn btn-secondary btn-sm" onclick="exportList()">📥 导出 Excel</button>
+          </div>
+          <div id="a-list-empty" class="empty">
+            <div class="empty-icon">📋</div>
+            暂无报名记录<br>等待运动员报名
+          </div>
+          <div id="a-list-content" style="display:none">
+            <table class="data-table">
+              <thead><tr><th>姓名</th><th>组别</th><th>状态</th><th>报名时间</th></tr></thead>
+              <tbody id="a-list-body"></tbody>
+            </table>
+          </div>
+          <div class="divider"></div>
+          <div class="notice-box">运动员报名并支付后，名单将实时更新</div>
+          <button class="btn btn-primary btn-full" id="a-gen-qr-btn" disabled onclick="showQR()">
+            📱 生成报名二维码
+          </button>
+        </div>
+
+        <!-- A: 钱包 -->
+        <div id="a-wallet" class="page">
+          <div class="wallet-card">
+            <div class="wallet-label">可用余额</div>
+            <div class="wallet-balance" id="a-wallet-balance">¥0.00</div>
+            <div class="wallet-detail">
+              <span>冻结金额：¥0.00</span>
+              <span>累计收入：¥<span id="a-wallet-total">0.00</span></span>
+            </div>
+          </div>
+          <div class="cashflow" id="a-cashflow"></div>
+          <button class="btn btn-success btn-full" id="a-withdraw-btn" disabled onclick="withdrawMoney()">
+            💸 申请提现到银行卡
+          </button>
+          <div class="form-hint" style="text-align:center;margin-top:6px;color:var(--text-muted);font-size:10px">
+            提现手续费 5%（非VIP）| 工作日 1-3 个工作日到账
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:11px;color:var(--text-muted)">
+            <strong>抽成规则：</strong><br>
+            · 非VIP主办方：提现金额 5%<br>
+            · 认证机构（协会/学校）：3%<br>
+            · VIP有效期内：免抽成
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PANEL B: 运动员 ============ -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-dot athlete"></div>
+          <span class="panel-title">🏃 运动员端</span>
+        </div>
+        <span class="panel-role">张小鹏（运动员）</span>
+      </div>
+      <div class="panel-body">
+        <div class="page-tabs">
+          <button class="tab active" onclick="switchTab('b','discover')">发现</button>
+          <button class="tab" onclick="switchTab('b','myReg')">我的报名</button>
+          <button class="tab" onclick="switchTab('b','result')">成绩</button>
+        </div>
+
+        <!-- B: 发现赛事 -->
+        <div id="b-discover" class="page active">
+          <div style="margin-bottom:10px">
+            <input class="form-input" placeholder="🔍 搜索赛事" style="background:var(--surface)">
+          </div>
+          <div id="b-competition-list">
+            <div class="empty">
+              <div class="empty-icon">🏟️</div>
+              暂无可报名赛事<br>等待主办方发布
+            </div>
+          </div>
+        </div>
+
+        <!-- B: 报名流程（嵌套页面） -->
+        <div id="b-register" class="page">
+          <div class="process-steps">
+            <div class="step"><div class="step-num active" id="r-step-1">1</div><span class="step-label">填表</span></div>
+            <div class="step-arrow">›</div>
+            <div class="step"><div class="step-num" id="r-step-2">2</div><span class="step-label">确认</span></div>
+            <div class="step-arrow">›</div>
+            <div class="step"><div class="step-num" id="r-step-3">3</div><span class="step-label">支付</span></div>
+            <div class="step-arrow">›</div>
+            <div class="step"><div class="step-num" id="r-step-4">4</div><span class="step-label">凭证</span></div>
+          </div>
+          <div id="reg-step-1">
+            <div style="background:var(--secondary);border-radius:10px;padding:12px;margin-bottom:12px">
+              <div style="font-size:14px;font-weight:700;margin-bottom:4px" id="reg-comp-title">2026 青少年壁球锦标赛</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.6)" id="reg-comp-meta">📅 2026-05-15 | 📍 广州市天河体育中心</div>
+              <div style="font-size:16px;font-weight:700;color:var(--primary);margin-top:6px" id="reg-comp-fee">¥199.00</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">姓名 *</label>
+              <input class="form-input" id="reg-name" value="张小鹏" placeholder="真实姓名">
+            </div>
+            <div class="form-group">
+              <label class="form-label">手机号 *</label>
+              <input class="form-input" id="reg-phone" value="13812345678" placeholder="手机号">
+            </div>
+            <div class="form-group">
+              <label class="form-label">参赛组别</label>
+              <select class="form-select" id="reg-group">
+                <option>U10（8-10岁）</option>
+                <option selected>U14（11-14岁）</option>
+                <option>U18（15-18岁）</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">紧急联系人</label>
+              <input class="form-input" id="reg-emergency" value="张先生" placeholder="家长姓名">
+            </div>
+            <div class="form-group">
+              <label class="form-label">紧急联系电话</label>
+              <input class="form-input" id="reg-emergency-phone" value="13987654321" placeholder="家长手机">
+            </div>
+            <div class="form-group">
+              <label class="form-label">健康状况声明</label>
+              <select class="form-select">
+                <option>身体健康，无不适合运动的疾病</option>
+                <option>有既往病史（需提供医院证明）</option>
+              </select>
+            </div>
+            <div class="notice-box" style="margin-bottom:10px">未满18岁需监护人确认，以上信息将用于赛事保险投保。</div>
+            <button class="btn btn-primary btn-full" onclick="regGoStep2()">确认报名信息 →</button>
+          </div>
+          <div id="reg-step-2" style="display:none">
+            <div class="review-card">
+              <div style="font-size:12px;font-weight:700;margin-bottom:8px">📋 报名信息确认</div>
+              <div class="info-row"><span class="info-label">赛事</span><span class="info-value" id="rev-title">2026 青少年壁球锦标赛</span></div>
+              <div class="info-row"><span class="info-label">姓名</span><span class="info-value" id="rev-name">张小鹏</span></div>
+              <div class="info-row"><span class="info-label">手机</span><span class="info-value" id="rev-phone">138****5678</span></div>
+              <div class="info-row"><span class="info-label">组别</span><span class="info-value" id="rev-group">U14</span></div>
+              <div class="info-row"><span class="info-label">报名费</span><span class="info-value" style="color:var(--primary)" id="rev-fee">¥199.00</span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="color:var(--text-muted);font-size:11px">☑️ 我已阅读并同意《赛事服务协议》和《隐私政策》</label>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-secondary" onclick="regBackStep1()" style="flex:1">← 返回修改</button>
+              <button class="btn btn-primary" onclick="regGoStep3()" style="flex:2" id="pay-btn">去支付 ¥199.00</button>
+            </div>
+          </div>
+          <div id="reg-step-3" style="display:none">
+            <div class="guide" style="margin-bottom:12px">
+              <div class="guide-title">💳 支付方式</div>
+              <div style="padding:4px 0;font-size:12px;display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px">💚</span><span>微信支付（推荐）</span><span class="badge badge-green" style="margin-left:auto">快捷</span>
+              </div>
+              <div style="padding:4px 0;font-size:12px;display:flex;align-items:center;gap:8px;opacity:.5">
+                <span style="font-size:18px">💳</span><span>银行卡支付</span>
+              </div>
+            </div>
+            <div class="notice-box" style="background:rgba(34,197,94,.1);border-color:var(--success);color:var(--success)">
+              ✅ 支付资金由微信支付统一托管，安全有保障
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;margin-bottom:10px">
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">订单金额</div>
+              <div style="font-size:28px;font-weight:700;color:var(--primary)">¥<span id="pay-amount">199.00</span></div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px">订单号：<span id="pay-orderno">AC2504190001</span></div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="doPayment()" id="pay-now-btn">
+              🟢 打开微信支付
+            </button>
+            <div class="result-box success" id="pay-success" style="display:none;margin-top:12px">
+              <div class="result-icon">✅</div>
+              <div class="result-title">支付成功！</div>
+              <div class="result-desc">报名已确认，请妥善保管凭证</div>
+            </div>
+            <button class="btn btn-secondary btn-full" onclick="switchTab('b','myReg')" id="pay-view-btn" style="display:none;margin-top:8px">
+              📋 查看我的报名
+            </button>
+          </div>
+          <div id="reg-step-4" style="display:none">
+            <div class="result-box success">
+              <div class="result-icon">🏆</div>
+              <div class="result-title">报名成功！</div>
+              <div class="result-desc">请出示下方二维码入场核销</div>
+            </div>
+            <div class="qr-container" id="ticket-qr" style="margin:16px auto">
+              <div style="color:#000;text-align:center">
+                <div style="font-size:10px;color:#666;margin-bottom:4px">报名凭证</div>
+                <div style="font-size:10px;font-weight:700">张小鹏 | U14</div>
+                <div style="font-size:10px;color:#999;margin-top:2px">AC2504190001</div>
+                <div style="font-size:80px;margin:8px 0">📋</div>
+              </div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px">
+              <div class="info-row"><span class="info-label">赛事</span><span class="info-value" id="tk-title">2026 青少年壁球锦标赛</span></div>
+              <div class="info-row"><span class="info-label">姓名</span><span class="info-value" id="tk-name">张小鹏</span></div>
+              <div class="info-row"><span class="info-label">组别</span><span class="info-value" id="tk-group">U14</span></div>
+              <div class="info-row"><span class="info-label">时间</span><span class="info-value">2026-05-15</span></div>
+              <div class="info-row"><span class="info-label">地点</span><span class="info-value">广州市天河体育中心</span></div>
+            </div>
+            <button class="btn btn-secondary btn-full" style="margin-top:10px" onclick="switchTab('b','myReg')">
+              📋 我的报名记录
+            </button>
+          </div>
+        </div>
+
+        <!-- B: 我的报名 -->
+        <div id="b-myReg" class="page">
+          <div id="b-myreg-empty" class="empty">
+            <div class="empty-icon">📋</div>
+            暂无报名记录<br><span style="font-size:11px">去发现赛事报名吧</span>
+          </div>
+          <div id="b-myreg-list"></div>
+        </div>
+
+        <!-- B: 成绩查询 -->
+        <div id="b-result" class="page">
+          <div class="form-group" style="margin-bottom:12px">
+            <input class="form-input" placeholder="🔍 输入姓名或参赛号码查询成绩" value="张小鹏">
+          </div>
+          <div class="result-box fail">
+            <div class="result-icon">⏳</div>
+            <div class="result-title">成绩暂未公布</div>
+            <div class="result-desc">主办方将在比赛结束后上传成绩，请耐心等待</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PANEL C: 平台运营 ============ -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-dot admin"></div>
+          <span class="panel-title">🖥️ 平台运营</span>
+        </div>
+        <span class="panel-role">AceCourt 官方</span>
+      </div>
+      <div class="panel-body">
+        <div class="page-tabs">
+          <button class="tab active" onclick="switchTab('c','audit')">审核</button>
+          <button class="tab pending-tab" onclick="switchTab('c','settlement')">结算</button>
+          <button class="tab" onclick="switchTab('c','data')">数据</button>
+        </div>
+
+        <!-- C: 审核 -->
+        <div id="c-audit" class="page active">
+          <div id="c-audit-empty" class="empty">
+            <div class="empty-icon">📝</div>
+            暂无待审核内容
+          </div>
+          <div id="c-audit-list"></div>
+        </div>
+
+        <!-- C: 结算 -->
+        <div id="c-settlement" class="page">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--success)" id="c-stat-gmv">¥0</div>
+              <div class="stat-label">今日 GMV</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--pending)" id="c-stat-fee">¥0</div>
+              <div class="stat-label">今日平台收入</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="c-stat-orders">0</div>
+              <div class="stat-label">今日订单</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="c-stat-withdraw">0</div>
+              <div class="stat-label">待处理提现</div>
+            </div>
+          </div>
+          <div class="guide" style="margin-bottom:10px">
+            <div class="guide-title">💰 资金流向</div>
+            <div class="cashflow" id="c-cashflow"></div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:8px">
+            结算规则：报名费 → 平台账户 → 扣除技术服务费 → 剩余转入主办方钱包 → 主办方申请提现
+          </div>
+        </div>
+
+        <!-- C: 数据 -->
+        <div id="c-data" class="page">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="c-data-events">0</div>
+              <div class="stat-label">总赛事数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="c-data-regs">0</div>
+              <div class="stat-label">总报名数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--success)" id="c-data-gmv">¥0</div>
+              <div class="stat-label">总 GMV</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--pending)" id="c-data-revenue">¥0</div>
+              <div class="stat-label">平台总收入</div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700;margin-bottom:8px">📊 收入来源占比</div>
+            <div style="font-size:11px;color:var(--text-muted)">
+              <div class="info-row"><span class="info-label">提现抽成 (50%)</span><span class="info-value" id="c-pct-withdraw">¥0</span></div>
+              <div class="info-row"><span class="info-label">VIP 会员费 (30%)</span><span class="info-value" id="c-pct-vip">¥0</span></div>
+              <div class="info-row"><span class="info-label">增值服务 (10%)</span><span class="info-value" id="c-pct-value">¥0</span></div>
+              <div class="info-row"><span class="info-label">广告推荐位 (10%)</span><span class="info-value" id="c-pct-ad">¥0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-qr" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('qr')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">📱 赛事报名二维码</span>
+      <button class="modal-close" onclick="closeModal('qr')">×</button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <div class="qr-container" style="margin:0 auto 12px;width:180px;height:180px">
+        <div style="color:#000;text-align:center">
+          <div style="font-size:80px">🏸</div>
+          <div style="font-size:11px;color:#666;margin-top:4px">2026青少年壁球锦标赛</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted)">分享此二维码给运动员<br>微信扫码即可直接报名</div>
+      <div style="font-size:11px;color:var(--primary);margin-top:6px">有效期至 2026-05-10</div>
+      <button class="btn btn-primary btn-full" style="margin-top:12px" onclick="closeModal('qr')">保存图片</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-withdraw" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('withdraw')">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">💸 提现申请</span>
+      <button class="modal-close" onclick="closeModal('withdraw')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:linear-gradient(135deg,var(--secondary),#0f2557);border-radius:12px;padding:16px;text-align:center;margin-bottom:14px">
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">可提现金额</div>
+        <div style="font-size:32px;font-weight:700;color:#fff" id="wd-amount">¥0.00</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">到账银行卡</label>
+        <input class="form-input" value="中国工商银行 **** 4582" readonly>
+      </div>
+      <div class="info-row"><span class="info-label">提现金额</span><span class="info-value" id="wd-total">¥0.00</span></div>
+      <div class="info-row"><span class="info-label">平台手续费 (5%)</span><span class="info-value" style="color:var(--pending)" id="wd-fee">¥0.00</span></div>
+      <div class="info-row"><span class="info-label">实际到账</span><span class="info-value" style="color:var(--success)" id="wd-actual">¥0.00</span></div>
+      <div class="notice-box" style="margin-top:10px">预计 1-3 个工作日到账</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('withdraw')">取消</button>
+      <button class="btn btn-success" onclick="confirmWithdraw()">确认提现</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-audit" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('audit')">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🔍 赛事审核详情</span>
+      <button class="modal-close" onclick="closeModal('audit')">×</button>
+    </div>
+    <div class="modal-body" id="audit-detail"></div>
+    <div class="modal-footer" id="audit-footer"></div>
+  </div>
+</div>
+
+<!-- ====================== -->
+<!--   JAVASCRIPT LOGIC      -->
+<!-- ====================== -->
+<script>
+// ─────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────
+const state = {
+  competition: null,       // 赛事对象
+  registrations: [],       // 报名列表
+  wallet: {
+    balance: 0,
+    totalIncome: 0,
+    transactions: []
+  },
+  myRegistration: null,   // 当前运动员的报名
+  orderNo: 0,
+  withdrawRequests: [],
+  auditItems: []
+};
+
+function generateOrderNo() {
+  state.orderNo++;
+  const now = new Date();
+  const ts = now.getFullYear().toString().slice(2) +
+             String(now.getMonth()+1).padStart(2,'0') +
+             String(now.getDate()).padStart(2,'0');
+  return `AC${ts}${String(state.orderNo).padStart(4,'0')}`;
+}
+
+// ─────────────────────────────────────────
+//  TAB SWITCHING
+// ─────────────────────────────────────────
+function switchTab(panel, page) {
+  document.querySelectorAll(`#${panel}-${page === 'discover' ? 'discover' : page}[]`).forEach(el => el && (el.style.display = 'none'));
+  document.querySelectorAll(`#${panel} .page`).forEach(p => p.classList.remove('active'));
+  document.querySelectorAll(`#${panel} .tab`).forEach(t => t.classList.remove('active'));
+  const target = document.getElementById(`${panel}-${page}`);
+  if (target) { target.classList.add('active'); }
+  const tabs = document.querySelectorAll(`#${panel} .tab`);
+  const pageMap = { home:0,create:1,list:2,wallet:3, discover:0,myReg:1,result:2, audit:0,settlement:1,data:2,register:0 };
+  if (tabs[pageMap[page]] !== undefined) tabs[pageMap[page]].classList.add('active');
+}
+
+// ─────────────────────────────────────────
+//  COMPETITION CREATION
+// ─────────────────────────────────────────
+function createCompetition() {
+  const title = document.getElementById('create-title').value;
+  const startDate = document.getElementById('create-start').value;
+  const endDate = document.getElementById('create-end').value;
+  const cap = parseInt(document.getElementById('create-cap').value);
+  const fee = parseFloat(document.getElementById('create-fee').value);
+  const location = document.getElementById('create-location').value;
+  const desc = document.getElementById('create-desc').value;
+  const sport = document.getElementById('create-sport').value;
+
+  if (!title || !fee) { alert('请填写必填项'); return; }
+
+  state.competition = {
+    id: Date.now(),
+    title, startDate, endDate, cap, fee,
+    location, desc, sport,
+    status: 'pending',
+    currentParticipants: 0
+  };
+
+  state.auditItems.push({
+    type: 'competition',
+    data: state.competition,
+    submittedAt: new Date().toLocaleString('zh-CN')
+  });
+
+  showNotif('赛事已提交，等待平台审核...', '#F59E0B');
+  updateAllStats();
+  updateTimeline(1);
+  switchTab('a','list');
+  document.getElementById('create-btn').disabled = true;
+  document.getElementById('create-btn').textContent = '⏳ 等待审核中...';
+}
+
+// ─────────────────────────────────────────
+//  PLATFORM AUDIT
+// ─────────────────────────────────────────
+function updateAuditList() {
+  const listEl = document.getElementById('c-audit-list');
+  const emptyEl = document.getElementById('c-audit-empty');
+  if (state.auditItems.length === 0) {
+    listEl.style.display = 'none';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.style.display = 'block';
+  listEl.innerHTML = state.auditItems.map(item => {
+    if (item.type === 'competition') {
+      return `<div class="review-card">
+        <div class="review-header">
+          <span class="review-name">${item.data.title}</span>
+          <span class="badge badge-orange">待审核</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted)">${item.data.sport} | ${item.data.startDate} | 名额${item.data.cap} | ¥${item.data.fee}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">提交时间：${item.submittedAt}</div>
+        <div class="review-actions">
+          <button class="btn btn-success btn-sm" onclick="approveCompetition(${item.data.id})">✅ 通过</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectCompetition(${item.data.id})">❌ 驳回</button>
+          <button class="btn btn-secondary btn-sm" onclick="viewAuditDetail(${item.data.id})">🔍 详情</button>
+        </div>
+      </div>`;
+    }
+    return '';
+  }).join('');
+}
+
+function viewAuditDetail(id) {
+  const item = state.auditItems.find(a => a.data && a.data.id === id);
+  if (!item) return;
+  const d = item.data;
+  document.getElementById('audit-detail').innerHTML = `
+    <div class="info-row"><span class="info-label">赛事名称</span><span class="info-value">${d.title}</span></div>
+    <div class="info-row"><span class="info-label">运动类型</span><span class="info-value">${d.sport}</span></div>
+    <div class="info-row"><span class="info-label">报名费</span><span class="info-value" style="color:var(--primary)">¥${d.fee}</span></div>
+    <div class="info-row"><span class="info-label">名额上限</span><span class="info-value">${d.cap}人</span></div>
+    <div class="info-row"><span class="info-label">赛事日期</span><span class="info-value">${d.startDate} ~ ${d.endDate}</span></div>
+    <div class="info-row"><span class="info-label">赛事地点</span><span class="info-value">${d.location}</span></div>
+    <div class="info-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <span class="info-label">赛事描述</span>
+      <span style="font-size:12px">${d.desc}</span>
+    </div>
+  `;
+  document.getElementById('audit-footer').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal('audit')">返回</button>
+    <button class="btn btn-danger" onclick="rejectCompetition(${id});closeModal('audit')">❌ 驳回</button>
+    <button class="btn btn-success" onclick="approveCompetition(${id});closeModal('audit')">✅ 通过</button>
+  `;
+  openModal('audit');
+}
+
+function approveCompetition(id) {
+  if (state.competition && state.competition.id === id) {
+    state.competition.status = 'open';
+    showNotif('✅ 赛事审核通过！运动员可开始报名', '#22C55E');
+  }
+  state.auditItems = state.auditItems.filter(a => !(a.data && a.data.id === id));
+  updateAuditList();
+  updateAllStats();
+  updateCompetitionList();
+  updateGlobalStatus();
+  updateTimeline(2);
+}
+
+function rejectCompetition(id) {
+  showNotif('❌ 赛事已驳回，请告知主办方修改后重新提交', '#EF4444');
+  state.auditItems = state.auditItems.filter(a => !(a.data && a.data.id === id));
+  updateAuditList();
+}
+
+// ─────────────────────────────────────────
+//  COMPETITION LIST (ATHLETE)
+// ─────────────────────────────────────────
+function updateCompetitionList() {
+  const listEl = document.getElementById('b-competition-list');
+  if (!state.competition || state.competition.status !== 'open') {
+    listEl.innerHTML = `<div class="empty"><div class="empty-icon">🏟️</div>暂无可报名赛事<br><span style="font-size:11px">等待主办方发布</span></div>`;
+    return;
+  }
+  const c = state.competition;
+  listEl.innerHTML = `<div class="competition-card" onclick="openRegistration()">
+    <div class="card-top">
+      <div>
+        <div class="card-title">${c.title}</div>
+        <div class="card-meta">
+          <span>🏸 ${c.sport}</span>
+          <span>📅 ${c.startDate}</span>
+          <span>📍 ${c.location}</span>
+        </div>
+      </div>
+      <span class="card-status open">报名中</span>
+    </div>
+    <div class="card-fee">¥${c.fee.toFixed(2)}</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:4px">剩余名额：${c.cap - c.currentParticipants} / ${c.cap}</div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────
+//  REGISTRATION FLOW
+// ─────────────────────────────────────────
+function openRegistration() {
+  if (!state.competition || state.competition.status !== 'open') return;
+  switchTab('b','register');
+  const c = state.competition;
+  document.getElementById('reg-comp-title').textContent = c.title;
+  document.getElementById('reg-comp-meta').textContent = `📅 ${c.startDate} | 📍 ${c.location}`;
+  document.getElementById('reg-comp-fee').textContent = `¥${c.fee.toFixed(2)}`;
+  resetRegSteps();
+}
+
+function resetRegSteps() {
+  ['reg-step-1','reg-step-2','reg-step-3','reg-step-4'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('reg-step-1').style.display = 'block';
+  ['r-step-1','r-step-2','r-step-3','r-step-4'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'step-num';
+  });
+  document.getElementById('r-step-1').classList.add('active');
+  document.getElementById('pay-success').style.display = 'none';
+  document.getElementById('pay-now-btn').style.display = '';
+}
+
+function setStep(n) {
+  ['reg-step-1','reg-step-2','reg-step-3','reg-step-4'].forEach((id,i) => {
+    document.getElementById(id).style.display = i === n-1 ? 'block' : 'none';
+  });
+  ['r-step-1','r-step-2','r-step-3','r-step-4'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.className = 'step-num';
+    if (i < n-1) el.classList.add('done');
+    else if (i === n-1) el.classList.add('active');
+  });
+}
+
+function regGoStep2() {
+  const name = document.getElementById('reg-name').value;
+  const phone = document.getElementById('reg-phone').value;
+  if (!name || !phone) { alert('请填写姓名和手机号'); return; }
+  document.getElementById('rev-name').textContent = name;
+  document.getElementById('rev-phone').textContent = phone.replace(/(\d{3})\d{4}(\d{4})/,'$1****$2');
+  document.getElementById('rev-group').textContent = document.getElementById('reg-group').value;
+  document.getElementById('rev-title').textContent = state.competition.title;
+  document.getElementById('rev-fee').textContent = `¥${state.competition.fee.toFixed(2)}`;
+  document.getElementById('pay-btn').textContent = `去支付 ¥${state.competition.fee.toFixed(2)}`;
+  setStep(2);
+}
+
+function regBackStep1() { setStep(1); }
+function regGoStep3() { setStep(3); }
+
+function doPayment() {
+  const btn = document.getElementById('pay-now-btn');
+  btn.textContent = '⏳ 支付中...';
+  btn.disabled = true;
+  const orderNo = generateOrderNo();
+  document.getElementById('pay-orderno').textContent = orderNo;
+  document.getElementById('pay-amount').textContent = state.competition.fee.toFixed(2);
+  // Simulate payment processing
+  setTimeout(() => {
+    btn.style.display = 'none';
+    document.getElementById('pay-success').style.display = 'block';
+    // Record registration
+    const reg = {
+      id: Date.now(),
+      orderNo,
+      name: document.getElementById('reg-name').value,
+      phone: document.getElementById('reg-phone').value,
+      group: document.getElementById('reg-group').value,
+      competitionId: state.competition.id,
+      competitionTitle: state.competition.title,
+      fee: state.competition.fee,
+      status: 'paid',
+      registeredAt: new Date().toLocaleString('zh-CN')
+    };
+    state.registrations.push(reg);
+    state.myRegistration = reg;
+    state.competition.currentParticipants++;
+    // Update wallet
+    const platformFee = Math.round(state.competition.fee * 0.05 * 100) / 100;
+    const settlement = Math.round((state.competition.fee - platformFee) * 100) / 100;
+    state.wallet.balance += settlement;
+    state.wallet.totalIncome += settlement;
+    state.wallet.transactions.push({
+      type: 'income',
+      amount: settlement,
+      balanceBefore: settlement - state.wallet.transactions.length > 0 ? 0 : 0,
+      remark: `报名费收入 - ${orderNo}`,
+      at: new Date().toLocaleString('zh-CN')
+    });
+    state.wallet.transactions.push({
+      type: 'fee',
+      amount: platformFee,
+      remark: `平台抽成(5%) - ${orderNo}`,
+      at: new Date().toLocaleString('zh-CN')
+    });
+    setTimeout(() => {
+      setStep(4);
+      document.getElementById('tk-title').textContent = reg.competitionTitle;
+      document.getElementById('tk-name').textContent = reg.name;
+      document.getElementById('tk-group').textContent = reg.group;
+      document.getElementById('pay-view-btn').style.display = '';
+      showNotif('🏆 报名成功！可前往「我的报名」查看凭证', '#22C55E');
+      updateAllStats();
+      updateRegistrantsList();
+      updateCashflow();
+      updateMyRegistrations();
+    }, 800);
+  }, 1200);
+}
+
+// ─────────────────────────────────────────
+//  MY REGISTRATIONS
+// ─────────────────────────────────────────
+function updateMyRegistrations() {
+  const emptyEl = document.getElementById('b-myreg-empty');
+  const listEl = document.getElementById('b-myreg-list');
+  if (!state.myRegistration) {
+    emptyEl.style.display = 'block';
+    listEl.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.style.display = 'block';
+  const r = state.myRegistration;
+  listEl.innerHTML = `<div class="competition-card">
+    <div class="card-top">
+      <div>
+        <div class="card-title">${r.competitionTitle}</div>
+        <div class="card-meta">
+          <span>📋 ${r.orderNo}</span>
+          <span>${r.registeredAt}</span>
+        </div>
+      </div>
+      <span class="card-status open">✅ 已报名</span>
+    </div>
+    <div style="font-size:12px;margin-top:6px">
+      <span>🏃 ${r.name}</span> · <span>${r.group}</span>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--primary);margin-top:4px">¥${r.fee.toFixed(2)}</div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────
+//  REGISTRANTS LIST (ORGANIZER)
+// ─────────────────────────────────────────
+function updateRegistrantsList() {
+  const countEl = document.getElementById('a-list-count');
+  const emptyEl = document.getElementById('a-list-empty');
+  const contentEl = document.getElementById('a-list-content');
+  const tbodyEl = document.getElementById('a-list-body');
+  countEl.textContent = state.registrations.length;
+  if (state.registrations.length === 0) {
+    emptyEl.style.display = 'block';
+    contentEl.style.display = 'none';
+    document.getElementById('a-gen-qr-btn').disabled = true;
+    return;
+  }
+  emptyEl.style.display = 'none';
+  contentEl.style.display = 'block';
+  document.getElementById('a-gen-qr-btn').disabled = false;
+  tbodyEl.innerHTML = state.registrations.map(r => `
+    <tr>
+      <td>${r.name}</td>
+      <td>${r.group}</td>
+      <td><span class="badge badge-green">已支付</span></td>
+      <td>${r.registeredAt}</td>
+    </tr>
+  `).join('');
+}
+
+// ─────────────────────────────────────────
+//  WALLET & CASHFLOW
+// ─────────────────────────────────────────
+function updateCashflow() {
+  // Organizer wallet
+  document.getElementById('a-wallet-balance').textContent = `¥${state.wallet.balance.toFixed(2)}`;
+  document.getElementById('a-wallet-total').textContent = state.wallet.totalIncome.toFixed(2);
+  const withdrawBtn = document.getElementById('a-withdraw-btn');
+  withdrawBtn.disabled = state.wallet.balance <= 0;
+
+  const flowEl = document.getElementById('a-cashflow');
+  flowEl.innerHTML = state.wallet.transactions.slice().reverse().slice(0, 5).map(t => `
+    <div class="cash-node">
+      <div>
+        <div style="font-size:12px;font-weight:600">${t.remark}</div>
+        <div class="cash-from">${t.at}</div>
+      </div>
+      <div class="cash-amount ${t.type === 'fee' ? 'fee' : 'positive'}">${t.type === 'fee' ? '-' : '+'}¥${t.amount.toFixed(2)}</div>
+    </div>
+  `).join('');
+
+  // Platform cashflow
+  const platformIncome = state.wallet.transactions.filter(t => t.type === 'fee').reduce((s, t) => s + t.amount, 0);
+  document.getElementById('c-cashflow').innerHTML = `
+    <div class="cash-node">
+      <div><div style="font-size:12px">平台今日收入</div></div>
+      <div class="cash-amount positive">+¥${platformIncome.toFixed(2)}</div>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────
+//  WITHDRAW
+// ─────────────────────────────────────────
+function withdrawMoney() {
+  if (state.wallet.balance <= 0) return;
+  const amount = state.wallet.balance;
+  const fee = Math.round(amount * 0.05 * 100) / 100;
+  const actual = Math.round((amount - fee) * 100) / 100;
+  document.getElementById('wd-amount').textContent = `¥${amount.toFixed(2)}`;
+  document.getElementById('wd-total').textContent = `¥${amount.toFixed(2)}`;
+  document.getElementById('wd-fee').textContent = `¥${fee.toFixed(2)}`;
+  document.getElementById('wd-actual').textContent = `¥${actual.toFixed(2)}`;
+  openModal('withdraw');
+}
+
+function confirmWithdraw() {
+  const amount = state.wallet.balance;
+  const fee = Math.round(amount * 0.05 * 100) / 100;
+  state.wallet.balance = 0;
+  state.withdrawRequests.push({
+    amount,
+    fee,
+    actual: amount - fee,
+    status: 'pending',
+    at: new Date().toLocaleString('zh-CN')
+  });
+  closeModal('withdraw');
+  showNotif(`💸 提现申请已提交，预计1-3个工作日到账`, '#22C55E');
+  updateCashflow();
+  updateAllStats();
+}
+
+// ─────────────────────────────────────────
+//  QR CODE
+// ─────────────────────────────────────────
+function showQR() {
+  if (!state.competition) return;
+  openModal('qr');
+}
+
+// ─────────────────────────────────────────
+//  EXPORT
+// ─────────────────────────────────────────
+function exportList() {
+  if (state.registrations.length === 0) return;
+  const headers = ['姓名', '组别', '手机', '订单号', '报名时间', '金额'];
+  const rows = state.registrations.map(r => [r.name, r.group, r.phone, r.orderNo, r.registeredAt, `¥${r.fee.toFixed(2)}`]);
+  let csv = '\uFEFF' + headers.join(',') + '\n';
+  rows.forEach(row => { csv += row.join(',') + '\n'; });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `报名名单_${state.competition ? state.competition.title : '赛事'}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  showNotif('📥 名单已导出（CSV格式）', '#22C55E');
+}
+
+// ─────────────────────────────────────────
+//  TIMELINE
+// ─────────────────────────────────────────
+function updateTimeline(step) {
+  const items = document.querySelectorAll('#a-timeline .timeline-item');
+  items.forEach((item, i) => {
+    const dot = item.querySelector('.timeline-dot');
+    dot.className = 'timeline-dot';
+    if (i < step) dot.classList.add('done');
+    else if (i === step) dot.classList.add('active');
+  });
+}
+
+// ─────────────────────────────────────────
+//  GLOBAL STATUS
+// ─────────────────────────────────────────
+function updateGlobalStatus() {
+  const c = state.competition;
+  const statusMap = { pending:'待审核', open:'报名中', closed:'报名截止' };
+  document.getElementById('gs-competition').textContent = c ? statusMap[c.status] || c.status : '—';
+  document.getElementById('gs-registrations').textContent = c ? `${c.currentParticipants} / ${c.cap}` : '0 / 50';
+  const totalIncome = state.registrations.reduce((s, r) => s + r.fee, 0);
+  const platformFee = Math.round(totalIncome * 0.05 * 100) / 100;
+  const settlement = Math.round(totalIncome * 0.95 * 100) / 100;
+  document.getElementById('gs-income').textContent = `¥${totalIncome.toFixed(2)}`;
+  document.getElementById('gs-fee').textContent = `¥${platformFee.toFixed(2)}`;
+  document.getElementById('gs-settlement').textContent = `¥${settlement.toFixed(2)}`;
+}
+
+// ─────────────────────────────────────────
+//  ALL STATS UPDATE
+// ─────────────────────────────────────────
+function updateAllStats() {
+  const totalRegs = state.registrations.length;
+  const totalIncome = state.registrations.reduce((s, r) => s + r.fee, 0);
+  const platformFee = Math.round(totalIncome * 0.05 * 100) / 100;
+  // Organizer stats
+  document.getElementById('a-stat-events').textContent = state.competition ? 1 : 0;
+  document.getElementById('a-stat-registrations').textContent = totalRegs;
+  document.getElementById('a-stat-income').textContent = `¥${state.wallet.totalIncome.toFixed(2)}`;
+  document.getElementById('a-stat-balance').textContent = `¥${state.wallet.balance.toFixed(2)}`;
+  // Platform stats
+  document.getElementById('c-stat-gmv').textContent = `¥${totalIncome.toFixed(2)}`;
+  document.getElementById('c-stat-fee').textContent = `¥${platformFee.toFixed(2)}`;
+  document.getElementById('c-stat-orders').textContent = state.registrations.length;
+  document.getElementById('c-stat-withdraw').textContent = state.withdrawRequests.length;
+  document.getElementById('c-data-events').textContent = state.competition ? 1 : 0;
+  document.getElementById('c-data-regs').textContent = totalRegs;
+  document.getElementById('c-data-gmv').textContent = `¥${totalIncome.toFixed(2)}`;
+  document.getElementById('c-data-revenue').textContent = `¥${platformFee.toFixed(2)}`;
+  document.getElementById('c-pct-withdraw').textContent = `¥${Math.round(totalIncome * 0.5).toFixed(2)}`;
+  document.getElementById('c-pct-vip').textContent = `¥${Math.round(totalIncome * 0.3).toFixed(2)}`;
+  document.getElementById('c-pct-value').textContent = `¥${Math.round(totalIncome * 0.1).toFixed(2)}`;
+  document.getElementById('c-pct-ad').textContent = `¥${Math.round(totalIncome * 0.1).toFixed(2)}`;
+  updateGlobalStatus();
+}
+
+// ─────────────────────────────────────────
+//  NOTIFICATIONS
+// ─────────────────────────────────────────
+function showNotif(msg, color) {
+  const area = document.getElementById('notif-area');
+  area.innerHTML = `<div class="notif" style="background:${color}">${msg}</div>`;
+  setTimeout(() => { area.innerHTML = ''; }, 4000);
+}
+
+// ─────────────────────────────────────────
+//  MODAL HELPERS
+// ─────────────────────────────────────────
+function openModal(name) {
+  document.getElementById(`modal-${name}`).style.display = 'flex';
+}
+function closeModal(name) {
+  document.getElementById(`modal-${name}`).style.display = 'none';
+}
+
+// ─────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────
+function init() {
+  updateCompetitionList();
+  updateAuditList();
+  updateRegistrantsList();
+  updateMyRegistrations();
+  updateCashflow();
+  updateGlobalStatus();
+  updateAllStats();
+  updateTimeline(0);
+}
+
+init();
+</script>
+</body>
+</html>

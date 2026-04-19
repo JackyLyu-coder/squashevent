@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AceCourt 运动员端</title>
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: rgba(99,102,241,0.15);
+    --accent: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --bg: #0a0a1a;
+    --bg-2: #11112b;
+    --card: rgba(20,20,50,0.85);
+    --glass: rgba(255,255,255,0.05);
+    --border: rgba(99,102,241,0.25);
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --shadow: 0 8px 32px rgba(99,102,241,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* 登录页 */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+  .login-wrap::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+    top: -200px; left: -200px;
+    pointer-events: none;
+  }
+  .login-wrap::after {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%);
+    bottom: -150px; right: -150px;
+    pointer-events: none;
+  }
+  .login-card {
+    width: 880px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: flex;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1;
+  }
+  .login-left {
+    width: 360px;
+    background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(168,85,247,0.1));
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+  }
+  .login-logo {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .login-desc {
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+  .login-features { display: flex; flex-direction: column; gap: 20px; }
+  .login-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .login-feature-icon {
+    width: 40px; height: 40px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .login-right {
+    flex: 1;
+    padding: 50px 48px;
+  }
+  .login-tabs {
+    display: flex;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 32px;
+  }
+  .login-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-muted);
+  }
+  .login-tab.active {
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    color: #fff;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  }
+  .form-input::placeholder { color: var(--text-muted); }
+  .code-row {
+    display: flex;
+    gap: 12px;
+  }
+  .code-row .form-input { flex: 1; }
+  .btn-code {
+    padding: 0 16px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .btn-code:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+  }
+  .login-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 24px 0;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .login-divider::before, .login-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .social-login {
+    display: flex;
+    gap: 12px;
+  }
+  .social-btn {
+    flex: 1;
+    padding: 12px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .social-btn:hover { border-color: var(--primary); }
+  /* 扫码登录 */
+  .qrcode-area {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .qrcode-box {
+    width: 180px;
+    height: 180px;
+    background: #fff;
+    border-radius: 12px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .qrcode-icon { font-size: 48px; color: #333; }
+  .qrcode-tip {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .qrcode-tip strong { color: var(--primary); }
+
+  /* 左侧导航 */
+  .sidebar {
+    width: 220px;
+    min-height: 100vh;
+    background: rgba(10,10,30,0.95);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .sidebar-logo {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo h1 {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .sidebar-logo span { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+  .sidebar-user {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .user-info .name { font-size: 13px; font-weight: 600; }
+  .user-info .tag {
+    display: inline-block;
+    font-size: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-top: 2px;
+  }
+  .nav-list { list-style: none; flex: 1; padding: 12px 0; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { color: var(--text); background: var(--glass); }
+  .nav-item.active {
+    color: #fff;
+    background: var(--primary-light);
+    border-left-color: var(--primary);
+  }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--danger);
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+  .sidebar-bottom { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-bottom .nav-item { padding: 8px 12px; font-size: 13px; }
+
+  /* 顶部栏 */
+  .topbar {
+    margin-left: 220px;
+    height: 60px;
+    background: rgba(10,10,30,0.8);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 16px;
+    position: fixed;
+    top: 0; right: 0; left: 220px;
+    z-index: 90;
+    backdrop-filter: blur(20px);
+  }
+  .topbar-title { font-size: 15px; font-weight: 600; margin-right: auto; }
+  .topbar-actions { display: flex; gap: 12px; align-items: center; }
+  .search-box {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    display: flex; align-items: center; gap: 8px;
+    width: 220px;
+  }
+  .search-box input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 13px;
+    width: 100%;
+  }
+  .search-box input::placeholder { color: var(--text-muted); }
+  .topbar-btn {
+    width: 36px; height: 36px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .topbar-btn:hover { border-color: var(--primary); }
+  .topbar-btn .badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    width: 16px; height: 16px;
+    background: var(--danger);
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    color: #fff;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+  .btn-ghost {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--primary); }
+
+  /* 主内容 */
+  .main {
+    margin-left: 220px;
+    padding: 84px 28px 28px;
+  }
+
+  /* 统计卡片 */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.08;
+    top: -20px; right: -20px;
+  }
+  .stat-card:nth-child(1)::before { background: var(--accent); }
+  .stat-card:nth-child(2)::before { background: var(--success); }
+  .stat-card:nth-child(3)::before { background: var(--primary); }
+  .stat-card:nth-child(4)::before { background: #a855f7; }
+  .stat-icon { font-size: 24px; margin-bottom: 12px; }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .stat-card:nth-child(1) .stat-value { color: var(--accent); }
+  .stat-card:nth-child(2) .stat-value { color: var(--success); }
+  .stat-card:nth-child(3) .stat-value { color: var(--primary); }
+  .stat-card:nth-child(4) .stat-value { color: #a855f7; }
+  .stat-label { font-size: 12px; color: var(--text-muted); }
+
+  /* 双栏布局 */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 20px;
+  }
+  .content-grid-equal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* 卡片 */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 15px; font-weight: 600; }
+  .card-link { font-size: 12px; color: var(--primary); cursor: pointer; }
+
+  /* 标签切换 */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+  .tab {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    color: #fff;
+  }
+
+  /* 比赛记录 */
+  .match-list { display: flex; flex-direction: column; gap: 12px; }
+  .match-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: var(--glass);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .match-item:hover { background: var(--primary-light); transform: translateX(4px); }
+  .match-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #1a1a3e, #2d1b4e);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .match-info { flex: 1; }
+  .match-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .match-meta { font-size: 11px; color: var(--text-muted); }
+  .match-score {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-right: 10px;
+  }
+  .result-tag {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .result-tag.win { background: rgba(16,185,129,0.15); color: var(--success); }
+  .result-tag.lose { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+  /* 排名列表 */
+  .ranking-list { display: flex; flex-direction: column; gap: 10px; }
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--glass);
+    border-radius: 10px;
+  }
+  .ranking-item.me {
+    background: var(--primary-light);
+    border: 1px solid rgba(99,102,241,0.3);
+  }
+  .rank-badge {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .rank-badge.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; }
+  .rank-badge.silver { background: linear-gradient(135deg, #94a3b8, #64748b); color: #fff; }
+  .rank-badge.bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+  .rank-badge.normal { background: var(--border); color: var(--text-muted); }
+  .rank-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+  }
+  .rank-info { flex: 1; }
+  .rank-name { font-size: 13px; font-weight: 500; }
+  .rank-name.me { color: var(--primary); }
+  .rank-stats { font-size: 10px; color: var(--text-muted); }
+  .rank-points { text-align: right; }
+  .rank-points .val { font-size: 13px; font-weight: 700; color: var(--primary); }
+  .rank-points .label { font-size: 10px; color: var(--text-muted); }
+
+  /* 积分时间线 */
+  .points-timeline { position: relative; padding-left: 18px; }
+  .points-timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .points-item { position: relative; padding-bottom: 18px; }
+  .points-item:last-child { padding-bottom: 0; }
+  .points-item::before {
+    content: '';
+    position: absolute;
+    left: -16px; top: 4px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--success);
+    border: 2px solid var(--bg);
+  }
+  .points-item.neg::before { background: var(--danger); }
+  .points-date { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; }
+  .points-event { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+  .points-change { font-size: 13px; font-weight: 700; }
+  .points-change.pos { color: var(--success); }
+  .points-change.neg { color: var(--danger); }
+
+  /* 筛选栏 */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .filter-tag {
+    padding: 6px 14px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .filter-tag:hover { border-color: var(--primary); color: var(--text); }
+  .filter-tag.active {
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    border-color: transparent;
+    color: #fff;
+  }
+
+  /* 赛事卡片网格 */
+  .event-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .event-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .event-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(99,102,241,0.2);
+  }
+  .event-cover {
+    height: 100px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+  }
+  .event-cover.squash { background: linear-gradient(135deg, #1a1a3e, #2d1b4e); }
+  .event-cover.tennis { background: linear-gradient(135deg, #1a3e1a, #2d4d2d); }
+  .event-cover.swim { background: linear-gradient(135deg, #1a3e3e, #2d4d4d); }
+  .event-cover.badminton { background: linear-gradient(135deg, #3e1a1a, #4d2d2d); }
+  .event-body { padding: 14px; }
+  .event-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .event-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; flex-direction: column; gap: 3px; }
+  .event-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .event-tag {
+    padding: 3px 8px;
+    background: var(--glass);
+    border-radius: 4px;
+    font-size: 10px;
+  }
+  .event-tag.primary { background: rgba(99,102,241,0.2); color: var(--primary); }
+  .event-tag.warning { background: rgba(245,158,11,0.15); color: var(--accent); }
+
+  /* 报名记录表格 */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th, .data-table td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table th { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .data-table td { font-size: 13px; }
+  .data-table tr:hover { background: var(--glass); }
+  .status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  .status-tag.upcoming { background: rgba(99,102,241,0.15); color: var(--primary); }
+  .status-tag.ongoing { background: rgba(245,158,11,0.15); color: var(--accent); }
+  .status-tag.done { background: rgba(16,185,129,0.15); color: var(--success); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-title { font-size: 15px; font-weight: 600; }
+  .modal-close {
+    width: 28px; height: 28px;
+    background: var(--glass);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .modal-close:hover { background: var(--danger); }
+  .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    z-index: 2000;
+    opacity: 0;
+    transition: all 0.3s;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+  <!-- 登录页 -->
+  <div class="login-wrap" id="loginPage">
+    <div class="login-card">
+      <div class="login-left">
+        <div class="login-logo">AceCourt 锐驰</div>
+        <div class="login-desc">青少年多运动赛事平台<br>发现精彩赛事，记录你的运动成长</div>
+        <div class="login-features">
+          <div class="login-feature">
+            <div class="login-feature-icon">🏆</div>
+            <span>发现精彩赛事，轻松报名参赛</span>
+          </div>
+          <div class="login-feature">
+            <div class="login-feature-icon">📊</div>
+            <span>记录比赛成绩，追踪排名积分</span>
+          </div>
+          <div class="login-feature">
+            <div class="login-feature-icon">🔔</div>
+            <span>订阅赛事动态，不错过重要通知</span>
+          </div>
+          <div class="login-feature">
+            <div class="login-feature-icon">📱</div>
+            <span>电子凭证入场，便捷环保</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="login-right">
+        <div class="login-tabs">
+          <div class="login-tab active" onclick="switchLoginTab('account', this)">账号登录</div>
+          <div class="login-tab" onclick="switchLoginTab('qrcode', this)">手机扫码</div>
+        </div>
+
+        <!-- 账号登录 -->
+        <div id="accountLogin">
+          <div class="form-group">
+            <label class="form-label">手机号</label>
+            <input type="tel" class="form-input" id="loginPhone" placeholder="请输入手机号" maxlength="11">
+          </div>
+          <div class="form-group">
+            <label class="form-label">验证码</label>
+            <div class="code-row">
+              <input type="text" class="form-input" id="loginCode" placeholder="请输入验证码" maxlength="6">
+              <button class="btn-code" id="sendCodeBtn" onclick="sendCode()">获取验证码</button>
+            </div>
+          </div>
+          <button class="btn-login" onclick="doLogin()">登录 / 注册</button>
+
+          <div class="login-divider">其他登录方式</div>
+          <div class="social-login">
+            <button class="social-btn" onclick="showToast('微信登录开发中')">💬 微信</button>
+            <button class="social-btn" onclick="showToast('Apple登录开发中')">🍎 Apple</button>
+          </div>
+        </div>
+
+        <!-- 手机扫码 -->
+        <div id="qrcodeLogin" class="hidden">
+          <div class="qrcode-area">
+            <div class="qrcode-box">
+              <div class="qrcode-icon">📱</div>
+              <div style="font-size: 11px; color: #666; margin-top: 4px;">扫码登录</div>
+            </div>
+            <p class="qrcode-tip">
+              请打开 <strong>AceCourt 手机端</strong><br>
+              点击「扫一扫」扫描上方二维码
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主应用 -->
+  <div class="hidden" id="mainApp">
+    <!-- 左侧导航 -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <h1>AceCourt</h1>
+        <span>锐驰 · 青少年多运动赛事平台</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar">陈</div>
+        <div class="user-info">
+          <div class="name">陈运动员</div>
+          <div class="tag">🏐 壁球 · U14</div>
+        </div>
+      </div>
+
+      <ul class="nav-list">
+        <li class="nav-item active" onclick="switchPage('dashboard', this)">
+          <span class="icon">📊</span>
+          <span>数据概览</span>
+        </li>
+        <li class="nav-item" onclick="switchPage('events', this)">
+          <span class="icon">🏆</span>
+          <span>赛事浏览</span>
+        </li>
+        <li class="nav-item" onclick="switchPage('records', this)">
+          <span class="icon">📋</span>
+          <span>我的报名</span>
+        </li>
+        <li class="nav-item" onclick="switchPage('stats', this)">
+          <span class="icon">🎯</span>
+          <span>我的成绩</span>
+        </li>
+        <li class="nav-item" onclick="openModal('subscriptionModal')">
+          <span class="icon">🔔</span>
+          <span>订阅管理</span>
+          <span class="badge">2</span>
+        </li>
+      </ul>
+
+      <div class="sidebar-bottom">
+        <div class="nav-item" onclick="openModal('preferenceModal')">
+          <span class="icon">⚙️</span>
+          <span>偏好设置</span>
+        </div>
+        <div class="nav-item" onclick="doLogout()">
+          <span class="icon">🚪</span>
+          <span>退出登录</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">📊 数据概览</div>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="搜索赛事、对手...">
+        </div>
+        <div class="topbar-btn">🔔<span class="badge">3</span></div>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main">
+      <!-- 数据概览 -->
+      <div id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-value">#5</div>
+            <div class="stat-label">U14壁球组 · 北京赛区排名</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value">1,280</div>
+            <div class="stat-label">累计积分</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value">1,856</div>
+            <div class="stat-label">Rating 评分</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-value">12</div>
+            <div class="stat-label">参赛场次 · 72%胜率</div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <!-- 近期战绩 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📊 近期战绩</div>
+              <span class="card-link" onclick="switchPage('stats', document.querySelectorAll('.nav-item')[3])">查看全部 ›</span>
+            </div>
+            <div class="tabs">
+              <span class="tab active">最近比赛</span>
+              <span class="tab">全部记录</span>
+            </div>
+            <div class="match-list">
+              <div class="match-item" onclick="openModal('matchModal')">
+                <div class="match-icon">🏐</div>
+                <div class="match-info">
+                  <div class="match-title">2026青少年壁球锦标赛</div>
+                  <div class="match-meta">U14组循环赛 · 2026-03-15</div>
+                </div>
+                <span class="match-score">3 : 1</span>
+                <span class="result-tag win">胜</span>
+              </div>
+              <div class="match-item" onclick="openModal('matchModal')">
+                <div class="match-icon">🏐</div>
+                <div class="match-info">
+                  <div class="match-title">2026青少年壁球锦标赛</div>
+                  <div class="match-meta">U14组半决赛 · 2026-03-15</div>
+                </div>
+                <span class="match-score">3 : 2</span>
+                <span class="result-tag win">胜</span>
+              </div>
+              <div class="match-item" onclick="openModal('matchModal')">
+                <div class="match-icon">🏐</div>
+                <div class="match-info">
+                  <div class="match-title">青少年壁球积分赛（第一站）</div>
+                  <div class="match-meta">U14组1/4决赛 · 2026-02-20</div>
+                </div>
+                <span class="match-score">1 : 3</span>
+                <span class="result-tag lose">负</span>
+              </div>
+              <div class="match-item" onclick="openModal('matchModal')">
+                <div class="match-icon">🏐</div>
+                <div class="match-info">
+                  <div class="match-title">青少年壁球积分赛（第一站）</div>
+                  <div class="match-meta">U14组小组赛 · 2026-02-19</div>
+                </div>
+                <span class="match-score">3 : 0</span>
+                <span class="result-tag win">胜</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右侧 -->
+          <div>
+            <!-- 排名 -->
+            <div class="card" style="margin-bottom: 20px;">
+              <div class="card-header">
+                <div class="card-title">🏆 排名</div>
+                <span class="card-link">U14壁球组</span>
+              </div>
+              <div class="ranking-list">
+                <div class="ranking-item">
+                  <span class="rank-badge gold">🥇</span>
+                  <div class="rank-avatar">王</div>
+                  <div class="rank-info">
+                    <div class="rank-name">王思远</div>
+                    <div class="rank-stats">12场 · 10胜</div>
+                  </div>
+                  <div class="rank-points">
+                    <div class="val">1,580</div>
+                    <div class="label">Rating 2,102</div>
+                  </div>
+                </div>
+                <div class="ranking-item me">
+                  <span class="rank-badge silver">🥈</span>
+                  <div class="rank-avatar">陈</div>
+                  <div class="rank-info">
+                    <div class="rank-name me">陈运动员 ← 你</div>
+                    <div class="rank-stats">12场 · 8胜</div>
+                  </div>
+                  <div class="rank-points">
+                    <div class="val">1,280</div>
+                    <div class="label">Rating 1,856</div>
+                  </div>
+                </div>
+                <div class="ranking-item">
+                  <span class="rank-badge bronze">🥉</span>
+                  <div class="rank-avatar">张</div>
+                  <div class="rank-info">
+                    <div class="rank-name">张明轩</div>
+                    <div class="rank-stats">12场 · 8胜</div>
+                  </div>
+                  <div class="rank-points">
+                    <div class="val">1,260</div>
+                    <div class="label">Rating 1,812</div>
+                  </div>
+                </div>
+                <div class="ranking-item">
+                  <span class="rank-badge normal">4</span>
+                  <div class="rank-avatar">李</div>
+                  <div class="rank-info">
+                    <div class="rank-name">李子豪</div>
+                    <div class="rank-stats">10场 · 6胜</div>
+                  </div>
+                  <div class="rank-points">
+                    <div class="val">980</div>
+                    <div class="label">Rating 1,654</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 积分明细 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">💰 积分明细</div>
+              </div>
+              <div class="points-timeline">
+                <div class="points-item">
+                  <div class="points-date">2026-03-15</div>
+                  <div class="points-event">2026青少年壁球锦标赛 · 冠军</div>
+                  <div class="points-change pos">+320 积分</div>
+                </div>
+                <div class="points-item">
+                  <div class="points-date">2026-03-15</div>
+                  <div class="points-event">2026青少年壁球锦标赛 · 亚军</div>
+                  <div class="points-change pos">+180 积分</div>
+                </div>
+                <div class="points-item">
+                  <div class="points-date">2026-02-20</div>
+                  <div class="points-event">青少年壁球积分赛（第一站）· 八强</div>
+                  <div class="points-change pos">+80 积分</div>
+                </div>
+                <div class="points-item">
+                  <div class="points-date">2026-02-19</div>
+                  <div class="points-event">青少年壁球积分赛（第一站）· 小组赛</div>
+                  <div class="points-change pos">+80 积分</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 赛事浏览 -->
+      <div id="page-events" class="hidden">
+        <div class="stats-grid" style="margin-bottom: 20px;">
+          <div class="stat-card" style="padding: 16px;">
+            <div class="stat-label">我的订阅</div>
+            <div class="stat-value" style="font-size: 24px;">2 <span style="font-size: 14px; font-weight: 400;">个赛事</span></div>
+          </div>
+          <div class="stat-card" style="padding: 16px;">
+            <div class="stat-label">即将开始</div>
+            <div class="stat-value" style="font-size: 24px;">1 <span style="font-size: 14px; font-weight: 400;">场</span></div>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <span class="filter-tag active">全部</span>
+          <span class="filter-tag" onclick="this.classList.toggle('active')">壁球</span>
+          <span class="filter-tag" onclick="this.classList.toggle('active')">网球</span>
+          <span class="filter-tag" onclick="this.classList.toggle('active')">游泳</span>
+          <span class="filter-tag" onclick="this.classList.toggle('active')">羽毛球</span>
+        </div>
+        <div class="filter-bar" style="margin-top: -10px;">
+          <span class="filter-tag active">全部城市</span>
+          <span class="filter-tag" onclick="this.classList.toggle('active')">北京</span>
+          <span class="filter-tag" onclick="this.classList.toggle('active')">上海</span>
+          <span class="filter-tag" onclick="this.classList.toggle('active')">广州</span>
+          <span class="filter-tag" onclick="this.classList.toggle('active')">深圳</span>
+        </div>
+
+        <div class="event-grid">
+          <div class="event-card" onclick="openModal('eventDetailModal')">
+            <div class="event-cover squash">🏐</div>
+            <div class="event-body">
+              <div class="event-title">2026青少年壁球锦标赛</div>
+              <div class="event-meta">
+                <div>📍 北京体育中心</div>
+                <div>📅 2026-05-15 至 05-17</div>
+              </div>
+              <div class="event-tags">
+                <span class="event-tag primary">报名中</span>
+                <span class="event-tag">U10/U14/U18</span>
+              </div>
+            </div>
+          </div>
+          <div class="event-card" onclick="openModal('eventDetailModal')">
+            <div class="event-cover tennis">🎾</div>
+            <div class="event-body">
+              <div class="event-title">青少年网球公开赛</div>
+              <div class="event-meta">
+                <div>📍 上海网球中心</div>
+                <div>📅 2026-05-22 至 05-24</div>
+              </div>
+              <div class="event-tags">
+                <span class="event-tag primary">报名中</span>
+                <span class="event-tag">U12/U16</span>
+              </div>
+            </div>
+          </div>
+          <div class="event-card" onclick="openModal('eventDetailModal')">
+            <div class="event-cover swim">🏊</div>
+            <div class="event-body">
+              <div class="event-title">青少年游泳锦标赛</div>
+              <div class="event-meta">
+                <div>📍 广州游泳馆</div>
+                <div>📅 2026-06-01 至 06-02</div>
+              </div>
+              <div class="event-tags">
+                <span class="event-tag warning">即将开始</span>
+                <span class="event-tag">U8/U12/U16</span>
+              </div>
+            </div>
+          </div>
+          <div class="event-card" onclick="openModal('eventDetailModal')">
+            <div class="event-cover badminton">🏸</div>
+            <div class="event-body">
+              <div class="event-title">青少年羽毛球积分赛</div>
+              <div class="event-meta">
+                <div>📍 深圳体育中心</div>
+                <div>📅 2026-06-08 至 06-09</div>
+              </div>
+              <div class="event-tags">
+                <span class="event-tag warning">即将开始</span>
+                <span class="event-tag">U10/U14/U18</span>
+              </div>
+            </div>
+          </div>
+          <div class="event-card" onclick="openModal('eventDetailModal')">
+            <div class="event-cover squash">🏐</div>
+            <div class="event-body">
+              <div class="event-title">青少年壁球积分赛（第二站）</div>
+              <div class="event-meta">
+                <div>📍 成都壁球馆</div>
+                <div>📅 2026-06-15 至 06-16</div>
+              </div>
+              <div class="event-tags">
+                <span class="event-tag primary">报名中</span>
+                <span class="event-tag">U10/U14/U18</span>
+              </div>
+            </div>
+          </div>
+          <div class="event-card" onclick="openModal('eventDetailModal')">
+            <div class="event-cover tennis">🎾</div>
+            <div class="event-body">
+              <div class="event-title">青少年网球冠军赛</div>
+              <div class="event-meta">
+                <div>📍 杭州网球中心</div>
+                <div>📅 2026-07-01 至 07-05</div>
+              </div>
+              <div class="event-tags">
+                <span class="event-tag primary">报名中</span>
+                <span class="event-tag">U14/U18/成人</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 我的报名 -->
+      <div id="page-records" class="hidden">
+        <div class="card" style="padding: 0;">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border);">
+            <div class="tabs" style="margin: 0; padding: 0; border: none;">
+              <span class="tab active">全部报名</span>
+              <span class="tab">即将开始</span>
+              <span class="tab">正在进行</span>
+              <span class="tab">已完成</span>
+            </div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>赛事名称</th>
+                <th>参赛组别</th>
+                <th>报名时间</th>
+                <th>报名费</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>🏐</span>
+                    <span>2026青少年壁球锦标赛</span>
+                  </div>
+                </td>
+                <td>U14组</td>
+                <td>2026-03-10</td>
+                <td>¥380</td>
+                <td><span class="status-tag ongoing">🏃 进行中</span></td>
+                <td><span class="card-link" onclick="openModal('voucherModal')">查看凭证</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>🏐</span>
+                    <span>青少年壁球积分赛（第一站）</span>
+                  </div>
+                </td>
+                <td>U14组</td>
+                <td>2026-02-01</td>
+                <td>¥280</td>
+                <td><span class="status-tag done">✅ 已完成</span></td>
+                <td><span class="card-link" onclick="openModal('voucherModal')">查看凭证</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>🎾</span>
+                    <span>青少年网球公开赛</span>
+                  </div>
+                </td>
+                <td>U14组</td>
+                <td>2026-04-18</td>
+                <td>¥420</td>
+                <td><span class="status-tag upcoming">📅 即将开始</span></td>
+                <td><span class="card-link" onclick="openModal('voucherModal')">查看凭证</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 我的成绩 -->
+      <div id="page-stats" class="hidden">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-value">#5</div>
+            <div class="stat-label">U14壁球组排名</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value">1,280</div>
+            <div class="stat-label">累计积分</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value">1,856</div>
+            <div class="stat-label">Rating</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-value">12</div>
+            <div class="stat-label">参赛场次</div>
+          </div>
+        </div>
+
+        <div class="content-grid-equal">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📊 比赛记录</div>
+            </div>
+            <div class="match-list">
+              <div class="match-item" onclick="openModal('matchModal')">
+                <div class="match-icon">🏐</div>
+                <div class="match-info">
+                  <div class="match-title">2026青少年壁球锦标赛</div>
+                  <div class="match-meta">U14组循环赛 · 2026-03-15</div>
+                </div>
+                <span class="match-score">3 : 1</span>
+                <span class="result-tag win">胜</span>
+              </div>
+              <div class="match-item" onclick="openModal('matchModal')">
+                <div class="match-icon">🏐</div>
+                <div class="match-info">
+                  <div class="match-title">2026青少年壁球锦标赛</div>
+                  <div class="match-meta">U14组半决赛 · 2026-03-15</div>
+                </div>
+                <span class="match-score">3 : 2</span>
+                <span class="result-tag win">胜</span>
+              </div>
+              <div class="match-item" onclick="openModal('matchModal')">
+                <div class="match-icon">🏐</div>
+                <div class="match-info">
+                  <div class="match-title">青少年壁球积分赛（第一站）</div>
+                  <div class="match-meta">U14组1/4决赛 · 2026-02-20</div>
+                </div>
+                <span class="match-score">1 : 3</span>
+                <span class="result-tag lose">负</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🏆 积分历史</div>
+            </div>
+            <div class="points-timeline">
+              <div class="points-item">
+                <div class="points-date">2026-03-15</div>
+                <div class="points-event">2026青少年壁球锦标赛 · 冠军</div>
+                <div class="points-change pos">+320 积分</div>
+              </div>
+              <div class="points-item">
+                <div class="points-date">2026-03-15</div>
+                <div class="points-event">2026青少年壁球锦标赛 · 亚军</div>
+                <div class="points-change pos">+180 积分</div>
+              </div>
+              <div class="points-item">
+                <div class="points-date">2026-02-20</div>
+                <div class="points-event">青少年壁球积分赛（第一站）</div>
+                <div class="points-change pos">+80 积分</div>
+              </div>
+              <div class="points-item">
+                <div class="points-date">2026-02-19</div>
+                <div class="points-event">青少年壁球积分赛（第一站）</div>
+                <div class="points-change pos">+80 积分</div>
+              </div>
+              <div class="points-item">
+                <div class="points-date">2026-01-15</div>
+                <div class="points-event">青少年壁球积分赛（开幕站）</div>
+                <div class="points-change pos">+50 积分</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal：比赛详情 -->
+  <div class="modal-overlay" id="matchModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">📊 比赛详情</div>
+        <div class="modal-close" onclick="closeModal('matchModal')">✕</div>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <span class="result-tag win" style="padding: 6px 16px; font-size: 13px;">胜</span>
+        </div>
+        <div style="background: var(--glass); border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+          <div style="text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 16px;">
+            🏆 2026青少年壁球锦标赛 · U14组循环赛
+          </div>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 32px;">
+            <div style="text-align: center; flex: 1;">
+              <div style="font-size: 13px; color: var(--primary); margin-bottom: 10px;">陈运动员</div>
+              <div style="font-size: 40px; font-weight: 700; color: var(--primary);">3</div>
+            </div>
+            <div style="font-size: 28px; color: var(--text-muted);">:</div>
+            <div style="text-align: center; flex: 1;">
+              <div style="font-size: 13px; margin-bottom: 10px;">张明轩</div>
+              <div style="font-size: 40px; font-weight: 700;">1</div>
+            </div>
+          </div>
+        </div>
+        <div style="background: var(--glass); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: var(--text-muted);">赛事日期</span>
+            <span style="font-size: 12px;">2026-03-15</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: var(--text-muted);">比赛地点</span>
+            <span style="font-size: 12px;">北京体育中心壁球馆</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 12px; color: var(--text-muted);">参赛组别</span>
+            <span style="font-size: 12px;">U14组</span>
+          </div>
+        </div>
+        <div style="background: rgba(16,185,129,0.1); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-size: 12px; color: var(--text-muted);">获得积分</span>
+            <span style="font-size: 13px; font-weight: 700; color: var(--success);">+120 积分</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 12px; color: var(--text-muted);">Rating 变化</span>
+            <span style="font-size: 13px; font-weight: 700; color: var(--primary);">+28 Rating</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal：赛事详情 -->
+  <div class="modal-overlay" id="eventDetailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">🏆 赛事详情</div>
+        <div class="modal-close" onclick="closeModal('eventDetailModal')">✕</div>
+      </div>
+      <div class="modal-body">
+        <div style="background: linear-gradient(135deg, #1a1a3e, #2d1b4e); border-radius: 12px; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 16px;">🏐</div>
+        <h3 style="font-size: 16px; margin-bottom: 8px;">2026青少年壁球锦标赛</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">主办方：北京青少年体育协会</p>
+        
+        <div style="background: var(--glass); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: var(--text-muted);">📍 比赛地点</span>
+            <span style="font-size: 12px;">北京体育中心</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: var(--text-muted);">📅 比赛日期</span>
+            <span style="font-size: 12px;">2026-05-15 至 05-17</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 12px; color: var(--text-muted);">👥 参赛组别</span>
+            <span style="font-size: 12px;">U10 / U14 / U18</span>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" style="width: 100%;" onclick="showToast('报名成功！'); closeModal('eventDetailModal');">立即报名 ¥380</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal：电子凭证 -->
+  <div class="modal-overlay" id="voucherModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">📱 电子凭证</div>
+        <div class="modal-close" onclick="closeModal('voucherModal')">✕</div>
+      </div>
+      <div class="modal-body">
+        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(168,85,247,0.1)); border: 2px dashed var(--border); border-radius: 16px; padding: 24px; text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 12px;">🏐</div>
+          <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">2026青少年壁球锦标赛</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">U14组 · 陈运动员</div>
+          <div style="width: 100px; height: 100px; background: #fff; border-radius: 10px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 40px;">📱</div>
+          <div style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: var(--primary);">AC20260315</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">出示此凭证即可入场</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal：订阅管理 -->
+  <div class="modal-overlay" id="subscriptionModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">🔔 订阅管理</div>
+        <div class="modal-close" onclick="closeModal('subscriptionModal')">✕</div>
+      </div>
+      <div class="modal-body">
+        <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">已订阅赛事 (2)</h4>
+        <div class="match-item" style="margin-bottom: 10px;">
+          <div class="match-icon">🏐</div>
+          <div class="match-info">
+            <div class="match-title">2026青少年壁球锦标赛</div>
+            <div class="match-meta">5月15日开赛</div>
+          </div>
+          <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 11px;" onclick="this.textContent='已取消'; this.disabled=true;">取消订阅</button>
+        </div>
+        <div class="match-item" style="margin-bottom: 20px;">
+          <div class="match-icon" style="background: linear-gradient(135deg, #1a3e1a, #2d4d2d);">🎾</div>
+          <div class="match-info">
+            <div class="match-title">青少年网球公开赛</div>
+            <div class="match-meta">5月22日开赛</div>
+          </div>
+          <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 11px;" onclick="this.textContent='已取消'; this.disabled=true;">取消订阅</button>
+        </div>
+        
+        <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">关注的主办方 (1)</h4>
+        <div class="match-item">
+          <div class="match-icon" style="background: linear-gradient(135deg, #1a3e1a, #2d4d2d);">🏢</div>
+          <div class="match-info">
+            <div class="match-title">北京青少年体育协会</div>
+            <div class="match-meta">已发布 12 场赛事</div>
+          </div>
+          <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 11px;" onclick="this.textContent='已取消'; this.disabled=true;">取消关注</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal：偏好设置 -->
+  <div class="modal-overlay" id="preferenceModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ 偏好设置</div>
+        <div class="modal-close" onclick="closeModal('preferenceModal')">✕</div>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 20px;">
+          <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">🏐 感兴趣的运动</h4>
+          <div class="filter-bar" style="margin: 0;">
+            <span class="filter-tag active">壁球</span>
+            <span class="filter-tag" onclick="this.classList.toggle('active')">网球</span>
+            <span class="filter-tag" onclick="this.classList.toggle('active')">游泳</span>
+            <span class="filter-tag" onclick="this.classList.toggle('active')">羽毛球</span>
+          </div>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">📍 关注城市</h4>
+          <div class="filter-bar" style="margin: 0;">
+            <span class="filter-tag active">北京</span>
+            <span class="filter-tag active">上海</span>
+            <span class="filter-tag" onclick="this.classList.toggle('active')">广州</span>
+            <span class="filter-tag" onclick="this.classList.toggle('active')">深圳</span>
+          </div>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">👤 年龄段</h4>
+          <div class="filter-bar" style="margin: 0;">
+            <span class="filter-tag" onclick="this.classList.toggle('active')">U8</span>
+            <span class="filter-tag" onclick="this.classList.toggle('active')">U10</span>
+            <span class="filter-tag active">U14</span>
+            <span class="filter-tag" onclick="this.classList.toggle('active')">U18</span>
+            <span class="filter-tag" onclick="this.classList.toggle('active')">成人组</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="closeModal('preferenceModal'); showToast('设置已保存');">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // 登录Tab切换
+    function switchLoginTab(tab, el) {
+      document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      if (tab === 'account') {
+        document.getElementById('accountLogin').classList.remove('hidden');
+        document.getElementById('qrcodeLogin').classList.add('hidden');
+      } else {
+        document.getElementById('accountLogin').classList.add('hidden');
+        document.getElementById('qrcodeLogin').classList.remove('hidden');
+      }
+    }
+
+    // 发送验证码
+    function sendCode() {
+      var btn = document.getElementById('sendCodeBtn');
+      var seconds = 60;
+      btn.disabled = true;
+      btn.textContent = seconds + 's后重试';
+      var timer = setInterval(function() {
+        seconds--;
+        if (seconds <= 0) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = '获取验证码';
+        } else {
+          btn.textContent = seconds + 's后重试';
+        }
+      }, 1000);
+      showToast('验证码已发送');
+    }
+
+    // 登录
+    function doLogin() {
+      var phone = document.getElementById('loginPhone').value.trim();
+      var code = document.getElementById('loginCode').value.trim();
+      if (!phone || phone.length !== 11) {
+        showToast('请输入正确的手机号');
+        return;
+      }
+      if (!code || code.length !== 6) {
+        showToast('请输入6位验证码');
+        return;
+      }
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      showToast('登录成功！');
+    }
+
+    // 退出登录
+    function doLogout() {
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('loginPage').classList.remove('hidden');
+      showToast('已退出登录');
+    }
+
+    // 页面切换
+    function switchPage(page, el) {
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+      
+      document.querySelectorAll('.main > div').forEach(p => p.classList.add('hidden'));
+      
+      var titles = {
+        dashboard: '📊 数据概览',
+        events: '🏆 赛事浏览',
+        records: '📋 我的报名',
+        stats: '🎯 我的成绩'
+      };
+      document.getElementById('pageTitle').textContent = titles[page] || page;
+      document.getElementById('page-' + page).classList.remove('hidden');
+    }
+
+    // Modal
+    function openModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.remove('show');
+      });
+    });
+
+    // Toast
+    function showToast(msg) {
+      var toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ESC关闭
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
+      }
+    });
+  </script>
+</body>
+</html>

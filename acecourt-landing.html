@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AceCourt 锐驰 — 青少年赛事一站式平台</title>
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --orange: #FF6B35;
+      --orange-light: #FF8C5A;
+      --orange-dark: #D94F1E;
+      --blue: #1A3A6B;
+      --blue-light: #2A5298;
+      --blue-dark: #0F1C2E;
+      --yellow: #FFD23F;
+      --white: #FFFFFF;
+      --gray-50: #FAFAFA;
+      --gray-100: #F0F0F0;
+      --gray-200: #E0E0E0;
+      --gray-400: #9E9E9E;
+      --gray-600: #666666;
+      --gray-800: #333333;
+      --radius: 12px;
+      --radius-lg: 20px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: var(--gray-800);
+      background: var(--white);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--gray-100); }
+    ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
+
+    /* ===== LAYOUT ===== */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 100px 0; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--orange); margin-bottom: 12px;
+    }
+    .section-label::before {
+      content: ''; display: block; width: 24px; height: 3px;
+      background: var(--orange); border-radius: 2px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px); font-weight: 800;
+      color: var(--blue-dark); line-height: 1.2; margin-bottom: 16px;
+    }
+    .section-subtitle {
+      font-size: 16px; color: var(--gray-600); max-width: 600px;
+      line-height: 1.8;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: var(--transition);
+    }
+    nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 18px; color: var(--blue-dark);
+    }
+    .nav-logo svg { width: 36px; height: 36px; }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: var(--gray-600);
+      transition: var(--transition); position: relative;
+    }
+    .nav-links a:hover { color: var(--orange); }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 2px; background: var(--orange);
+      transition: var(--transition); border-radius: 1px;
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      background: var(--orange); color: white !important;
+      padding: 8px 20px; border-radius: 100px; font-weight: 600 !important;
+    }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: var(--orange-dark) !important; }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .nav-hamburger span { width: 24px; height: 2px; background: var(--gray-800); border-radius: 1px; transition: var(--transition); }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      background: linear-gradient(160deg, #0F1C2E 0%, #1A3A6B 50%, #2A5298 100%);
+      position: relative; overflow: hidden; padding-top: 64px;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-particles {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    .particle {
+      position: absolute; border-radius: 50%;
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+    }
+    .hero-content {
+      position: relative; z-index: 1; text-align: center;
+      color: white; max-width: 900px; margin: 0 auto;
+      padding: 60px 24px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,107,53,0.2); border: 1px solid rgba(255,107,53,0.4);
+      color: var(--orange-light); padding: 6px 16px; border-radius: 100px;
+      font-size: 13px; font-weight: 600; margin-bottom: 32px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px; background: var(--orange); border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+    .hero-logo-wrap {
+      display: flex; align-items: center; justify-content: center;
+      gap: 16px; margin-bottom: 40px;
+    }
+    .hero-logo-wrap svg { width: 80px; height: 80px; }
+    .hero-brand-text { text-align: left; }
+    .hero-brand-text .en {
+      font-size: 32px; font-weight: 900; line-height: 1;
+      letter-spacing: -0.5px;
+    }
+    .hero-brand-text .cn {
+      font-size: 16px; font-weight: 500; color: rgba(255,255,255,0.7);
+      letter-spacing: 4px;
+    }
+    .hero-title {
+      font-size: clamp(32px, 6vw, 64px); font-weight: 900; line-height: 1.1;
+      margin-bottom: 24px;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--orange), var(--yellow));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: clamp(16px, 2vw, 20px); color: rgba(255,255,255,0.75);
+      max-width: 640px; margin: 0 auto 48px; line-height: 1.8;
+    }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 48px; margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num {
+      font-size: 36px; font-weight: 900; color: var(--orange);
+      line-height: 1;
+    }
+    .hero-stat .label {
+      font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px;
+    }
+    .hero-actions {
+      display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 32px; border-radius: 100px; font-size: 15px;
+      font-weight: 700; transition: var(--transition); cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--orange); color: white;
+      box-shadow: 0 4px 20px rgba(255,107,53,0.4);
+    }
+    .btn-primary:hover {
+      background: var(--orange-dark);
+      box-shadow: 0 6px 28px rgba(255,107,53,0.5);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent; color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .btn-outline:hover {
+      border-color: white; background: rgba(255,255,255,0.1);
+    }
+    .hero-scroll {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.5); font-size: 12px;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+    .hero-scroll svg { width: 20px; height: 20px; }
+
+    /* ===== PAIN ===== */
+    .pain { background: var(--gray-50); }
+    .pain-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px; margin-top: 48px;
+    }
+    .pain-card {
+      background: white; border-radius: var(--radius-lg); padding: 32px;
+      border: 1px solid var(--gray-200);
+      transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .pain-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--orange), var(--orange-light));
+      transform: scaleX(0); transform-origin: left; transition: var(--transition);
+    }
+    .pain-card:hover::before { transform: scaleX(1); }
+    .pain-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .pain-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(255,107,53,0.1); display: flex; align-items: center;
+      justify-content: center; margin-bottom: 20px; color: var(--orange);
+    }
+    .pain-card h3 { font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 8px; }
+    .pain-card p { font-size: 14px; color: var(--gray-600); line-height: 1.7; }
+
+    /* ===== SOLUTION ===== */
+    .solution-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+      align-items: center; margin-top: 60px;
+    }
+    .solution-visual {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      border-radius: var(--radius-lg); padding: 40px;
+      position: relative; overflow: hidden;
+    }
+    .solution-visual::before {
+      content: ''; position: absolute; top: -50%; right: -30%;
+      width: 80%; height: 200%; background: radial-gradient(circle, rgba(255,107,53,0.15), transparent 60%);
+    }
+    .phone-mock {
+      background: #1a1a2e; border-radius: 24px; padding: 8px;
+      max-width: 260px; margin: 0 auto; position: relative; z-index: 1;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .phone-screen {
+      background: white; border-radius: 18px; overflow: hidden;
+      min-height: 420px;
+    }
+    .phone-header {
+      background: var(--orange); padding: 16px; text-align: center;
+      color: white;
+    }
+    .phone-header .title { font-size: 14px; font-weight: 700; }
+    .phone-header .sub { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+    .phone-content { padding: 16px; }
+    .phone-card {
+      background: var(--gray-50); border-radius: 10px; padding: 12px; margin-bottom: 10px;
+    }
+    .phone-card .row { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray-600); margin-bottom: 6px; }
+    .phone-card .row:last-child { margin-bottom: 0; }
+    .phone-btn {
+      background: var(--orange); color: white; text-align: center;
+      padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      margin-top: 12px;
+    }
+    .solution-text h3 {
+      font-size: 24px; font-weight: 800; color: var(--blue-dark);
+      margin-bottom: 16px; line-height: 1.3;
+    }
+    .solution-text p { font-size: 15px; color: var(--gray-600); line-height: 1.8; margin-bottom: 24px; }
+    .solution-features { list-style: none; }
+    .solution-features li {
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 16px; font-size: 15px; font-weight: 500;
+    }
+    .solution-features li .icon {
+      width: 24px; height: 24px; min-width: 24px; border-radius: 50%;
+      background: rgba(255,107,53,0.1); display: flex; align-items: center;
+      justify-content: center; color: var(--orange); font-size: 12px; margin-top: 2px;
+    }
+
+    /* ===== ROLES ===== */
+    .roles { background: var(--gray-50); }
+    .roles-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+      margin-top: 48px;
+    }
+    .role-card {
+      background: white; border-radius: var(--radius-lg); overflow: hidden;
+      border: 1px solid var(--gray-200); transition: var(--transition);
+      position: relative;
+    }
+    .role-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .role-header {
+      padding: 32px 28px 24px; position: relative; overflow: hidden;
+    }
+    .role-header .bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+      opacity: 0.95;
+    }
+    .role-header .bg::after {
+      content: ''; position: absolute; bottom: -20px; right: -20px;
+      width: 100px; height: 100px; border-radius: 50%;
+      background: rgba(255,107,53,0.15);
+    }
+    .role-header .content { position: relative; z-index: 1; }
+    .role-emoji { font-size: 40px; margin-bottom: 12px; }
+    .role-card h3 { font-size: 20px; font-weight: 800; color: white; margin-bottom: 4px; }
+    .role-card .role-sub { font-size: 13px; color: rgba(255,255,255,0.7); }
+    .role-body { padding: 24px 28px; }
+    .role-list { list-style: none; }
+    .role-list li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--gray-600); padding: 6px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .role-list li:last-child { border-bottom: none; }
+    .role-list li::before {
+      content: '✓'; width: 18px; height: 18px; min-width: 18px;
+      background: rgba(255,107,53,0.1); color: var(--orange);
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 10px; font-weight: 700;
+    }
+
+    /* ===== FLOW ===== */
+    .flow-steps {
+      display: flex; align-items: flex-start; gap: 20px;
+      margin-top: 60px; position: relative; overflow-x: auto;
+      padding-bottom: 20px;
+    }
+    .flow-steps::before {
+      content: ''; position: absolute; top: 36px; left: 60px; right: 60px;
+      height: 3px; background: linear-gradient(90deg, var(--orange), var(--blue));
+      border-radius: 2px; z-index: 0;
+    }
+    .flow-step {
+      flex: 1; min-width: 180px; text-align: center; position: relative; z-index: 1;
+    }
+    .flow-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: white; border: 3px solid var(--orange);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; font-size: 28px;
+      box-shadow: 0 4px 20px rgba(255,107,53,0.2);
+      transition: var(--transition);
+    }
+    .flow-step:hover .flow-icon {
+      background: var(--orange); transform: scale(1.1);
+      box-shadow: 0 8px 30px rgba(255,107,53,0.4);
+    }
+    .flow-step h4 { font-size: 14px; font-weight: 700; color: var(--blue-dark); margin-bottom: 4px; }
+    .flow-step p { font-size: 12px; color: var(--gray-400); }
+
+    /* ===== REVENUE ===== */
+    .revenue { background: var(--gray-50); }
+    .revenue-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+      margin-top: 48px; align-items: start;
+    }
+    .revenue-flow {
+      background: white; border-radius: var(--radius-lg); padding: 36px;
+      border: 1px solid var(--gray-200);
+    }
+    .revenue-flow h3 { font-size: 18px; font-weight: 700; color: var(--blue-dark); margin-bottom: 24px; }
+    .flow-box {
+      background: var(--gray-50); border-radius: var(--radius); padding: 20px;
+      margin-bottom: 16px; border-left: 4px solid var(--blue); font-size: 14px;
+      font-weight: 600; color: var(--blue-dark);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .flow-box:last-child { margin-bottom: 0; border-left-color: var(--orange); }
+    .flow-box .arrow { margin-left: auto; color: var(--gray-400); font-size: 18px; }
+    .flow-box .amount {
+      background: var(--orange); color: white; padding: 2px 10px;
+      border-radius: 100px; font-size: 12px; font-weight: 700;
+    }
+    .revenue-rules { display: flex; flex-direction: column; gap: 16px; }
+    .rule-card {
+      background: white; border-radius: var(--radius); padding: 20px 24px;
+      border: 1px solid var(--gray-200); display: flex; align-items: center;
+      gap: 16px; transition: var(--transition);
+    }
+    .rule-card:hover { border-color: var(--orange); box-shadow: var(--shadow); }
+    .rule-pct { font-size: 28px; font-weight: 900; color: var(--orange); min-width: 60px; }
+    .rule-info h4 { font-size: 15px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
+    .rule-info p { font-size: 13px; color: var(--gray-600); }
+
+    /* ===== VIP ===== */
+    .vip-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+      margin-top: 48px;
+    }
+    .vip-card {
+      background: white; border-radius: var(--radius-lg); padding: 36px 28px;
+      border: 2px solid var(--gray-200); transition: var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .vip-card.featured {
+      border-color: var(--orange);
+      box-shadow: 0 8px 40px rgba(255,107,53,0.2);
+    }
+    .vip-card.featured::before {
+      content: '最受欢迎'; position: absolute; top: 16px; right: -24px;
+      background: var(--orange); color: white; font-size: 11px; font-weight: 700;
+      padding: 4px 32px; transform: rotate(45deg);
+    }
+    .vip-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .vip-card.featured:hover { border-color: var(--orange-dark); }
+    .vip-name { font-size: 20px; font-weight: 800; color: var(--gray-800); margin-bottom: 4px; }
+    .vip-duration { font-size: 13px; color: var(--gray-400); margin-bottom: 20px; }
+    .vip-price {
+      font-size: 36px; font-weight: 900; color: var(--orange); margin-bottom: 24px;
+    }
+    .vip-price span { font-size: 16px; font-weight: 500; color: var(--gray-400); }
+    .vip-divider { height: 1px; background: var(--gray-200); margin-bottom: 24px; }
+    .vip-benefits { list-style: none; }
+    .vip-benefits li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--gray-600); padding: 6px 0;
+    }
+    .vip-benefits li .check {
+      color: var(--orange); font-size: 16px; min-width: 18px; margin-top: 1px;
+    }
+
+    /* ===== ROADMAP ===== */
+    .roadmap { background: var(--gray-50); }
+    .roadmap-timeline {
+      margin-top: 60px; position: relative;
+    }
+    .roadmap-timeline::before {
+      content: ''; position: absolute; left: 200px; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(180deg, var(--orange), var(--blue));
+    }
+    .roadmap-item {
+      display: flex; gap: 40px; margin-bottom: 48px;
+      position: relative;
+    }
+    .roadmap-date {
+      width: 160px; min-width: 160px; text-align: right; padding-top: 4px;
+    }
+    .roadmap-date .ver {
+      font-size: 14px; font-weight: 800; color: var(--orange);
+    }
+    .roadmap-date .time {
+      font-size: 12px; color: var(--gray-400); margin-top: 2px;
+    }
+    .roadmap-dot {
+      width: 16px; height: 16px; min-width: 16px; border-radius: 50%;
+      background: var(--orange); border: 3px solid white;
+      box-shadow: 0 0 0 3px var(--orange); margin-top: 4px;
+      position: relative; z-index: 1;
+    }
+    .roadmap-content {
+      background: white; border-radius: var(--radius-lg); padding: 24px 28px;
+      border: 1px solid var(--gray-200); flex: 1;
+      transition: var(--transition);
+    }
+    .roadmap-content:hover { box-shadow: var(--shadow); border-color: var(--orange); }
+    .roadmap-content h4 {
+      font-size: 16px; font-weight: 700; color: var(--blue-dark); margin-bottom: 12px;
+    }
+    .roadmap-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .roadmap-tag {
+      background: var(--gray-100); color: var(--gray-600);
+      padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 500;
+    }
+    .roadmap-tag.highlight {
+      background: rgba(255,107,53,0.1); color: var(--orange);
+    }
+
+    /* ===== CTA ===== */
+    .cta-section {
+      background: linear-gradient(135deg, var(--orange-dark), var(--orange));
+      padding: 80px 0; text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .cta-section .content { position: relative; z-index: 1; }
+    .cta-section h2 {
+      font-size: clamp(28px, 4vw, 44px); font-weight: 900; color: white;
+      margin-bottom: 16px; line-height: 1.2;
+    }
+    .cta-section p { font-size: 16px; color: rgba(255,255,255,0.85); margin-bottom: 36px; }
+    .cta-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .btn-white {
+      background: white; color: var(--orange); font-weight: 700;
+    }
+    .btn-white:hover { background: var(--gray-100); transform: translateY(-2px); }
+    .btn-ghost { border: 2px solid white; color: white; }
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--blue-dark); padding: 48px 0 32px;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer-inner {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; gap: 32px; margin-bottom: 32px;
+    }
+    .footer-brand { max-width: 300px; }
+    .footer-brand .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 18px; font-weight: 800; color: white; margin-bottom: 12px;
+    }
+    .footer-brand p { font-size: 13px; line-height: 1.7; }
+    .footer-links h5 { color: white; font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+    .footer-links ul { list-style: none; }
+    .footer-links li { margin-bottom: 8px; }
+    .footer-links a { font-size: 13px; transition: var(--transition); }
+    .footer-links a:hover { color: var(--orange); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px;
+      text-align: center; font-size: 12px;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .solution-grid { grid-template-columns: 1fr; }
+      .solution-visual { max-width: 400px; margin: 0 auto; }
+      .roles-grid { grid-template-columns: 1fr; max-width: 480px; margin: 48px auto 0; }
+      .vip-grid { grid-template-columns: 1fr; max-width: 400px; margin: 48px auto 0; }
+      .revenue-layout { grid-template-columns: 1fr; }
+      .roadmap-timeline::before { left: 24px; }
+      .roadmap-item { flex-direction: column; gap: 12px; padding-left: 56px; }
+      .roadmap-date { text-align: left; width: auto; }
+      .roadmap-dot { position: absolute; left: 16px; top: 4px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .hero-stats { gap: 24px; }
+      .flow-steps { flex-direction: column; align-items: center; }
+      .flow-steps::before { display: none; }
+      .flow-step { width: 100%; max-width: 300px; }
+    }
+
+    /* ===== MOBILE NAV OVERLAY ===== */
+    .nav-overlay {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(15,28,46,0.97); backdrop-filter: blur(20px);
+      padding: 80px 24px 24px;
+    }
+    .nav-overlay.active { display: block; }
+    .nav-overlay ul { list-style: none; }
+    .nav-overlay li { margin-bottom: 24px; }
+    .nav-overlay a {
+      font-size: 20px; font-weight: 700; color: white;
+      display: block; padding: 8px 0;
+    }
+    .nav-close {
+      position: absolute; top: 20px; right: 24px;
+      background: none; border: none; color: white;
+      font-size: 28px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="10" fill="#FF6B35"/>
+          <path d="M18 6L26 28H10L18 6Z" fill="white"/>
+          <path d="M18 12L22 24H14L18 12Z" fill="#FF6B35"/>
+          <rect x="12" y="26" width="12" height="3" rx="1.5" fill="white"/>
+        </svg>
+        <span>AceCourt <em style="font-weight:500;font-size:14px;color:var(--gray-400);font-style:normal;">锐驰</em></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#pain">痛点</a></li>
+        <li><a href="#solution">方案</a></li>
+        <li><a href="#roles">三端</a></li>
+        <li><a href="#flow">流程</a></li>
+        <li><a href="#revenue">盈利</a></li>
+        <li><a href="#vip">VIP</a></li>
+        <li><a href="#roadmap">路线图</a></li>
+        <li><a href="#cta" class="nav-cta">申请内测</a></li>
+      </ul>
+      <div class="nav-hamburger" onclick="toggleNav()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="nav-overlay" id="navOverlay">
+    <button class="nav-close" onclick="toggleNav()">×</button>
+    <ul>
+      <li><a href="#pain" onclick="toggleNav()">痛点</a></li>
+      <li><a href="#solution" onclick="toggleNav()">方案</a></li>
+      <li><a href="#roles" onclick="toggleNav()">三端</a></li>
+      <li><a href="#flow" onclick="toggleNav()">流程</a></li>
+      <li><a href="#revenue" onclick="toggleNav()">盈利</a></li>
+      <li><a href="#vip" onclick="toggleNav()">VIP</a></li>
+      <li><a href="#roadmap" onclick="toggleNav()">路线图</a></li>
+      <li><a href="#cta" onclick="toggleNav()">申请内测</a></li>
+    </ul>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        MVP 开发中 · 2026 Q2 启动
+      </div>
+      <div class="hero-logo-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="80" height="80" rx="22" fill="rgba(255,107,53,0.15)" stroke="rgba(255,107,53,0.3)" stroke-width="2"/>
+          <path d="M40 14L60 62H20L40 14Z" fill="white"/>
+          <path d="M40 26L50 56H30L40 26Z" fill="#FF6B35"/>
+          <rect x="26" y="58" width="28" height="6" rx="3" fill="rgba(255,210,63,0.8)"/>
+        </svg>
+        <div class="hero-brand-text">
+          <div class="en">AceCourt</div>
+          <div class="cn">锐　驰</div>
+        </div>
+      </div>
+      <h1 class="hero-title">
+        青少年赛事，<br>
+        <span class="highlight">一键搞定</span>
+      </h1>
+      <p class="hero-subtitle">
+        面向亚太青少年的多运动赛事报名与财务管理平台。<br>
+        报名 + 支付 + 积分，三位一体，移动优先。
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="num">35+</div>
+          <div class="label">MVP 功能点</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">3</div>
+          <div class="label">用户端产品</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">4</div>
+          <div class="label">收入来源</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">5年</div>
+          <div class="label">国际化路径</div>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <a href="#cta" class="btn btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          申请内测资格
+        </a>
+        <a href="#solution" class="btn btn-outline">
+          了解更多 →
+        </a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>向下滚动</span>
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+    </div>
+  </section>
+
+  <!-- ===== PAIN ===== -->
+  <section class="section pain" id="pain">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">痛点洞察</div>
+        <h2 class="section-title">办赛很难，真的很难</h2>
+        <p class="section-subtitle">
+          俱乐部、培训机构、学校办赛时，报名收费、名单管理、资金结算全靠人工，效率低、风险高、体验差。
+        </p>
+      </div>
+      <div class="pain-grid">
+        <div class="pain-card reveal reveal-delay-1">
+          <div class="pain-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <h3>收款靠转账</h3>
+          <p>微信转账、支付宝——无法追踪谁付了款、对不上账、资金分散在个人账户，风险极高。</p>
+        </div>
+        <div class="pain-card reveal reveal-delay-2">
+          <div class="pain-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
+          <h3>名单靠 Excel</h3>
+          <p>报名表靠微信群、纸质表格，汇总麻烦，修改易出错，比赛现场核销更是噩梦。</p>
+        </div>
+        <div class="pain-card reveal reveal-delay-3">
+          <div class="pain-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <h3>提现周期长</h3>
+          <p>报名费先进私人账户，想提出来还要等对账，平台抽成不透明，主办方心里没底。</p>
+        </div>
+        <div class="pain-card reveal reveal-delay-1">
+          <div class="pain-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          </div>
+          <h3>通知靠微信群</h3>
+          <p>报名成功通知、比赛延期、退款公告全靠群发，经常发错、漏发、重复发。</p>
+        </div>
+        <div class="pain-card reveal reveal-delay-2">
+          <div class="pain-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3>成绩难查询</h3>
+          <p>比赛结束后家长追着问成绩，教练挨个发文件，没有统一的成绩公示和查询入口。</p>
+        </div>
+        <div class="pain-card reveal reveal-delay-3">
+          <div class="pain-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h3>资质难验证</h3>
+          <p>家长担心资金安全、主办方资质，比赛是否合规——没有平台背书，信任成本高。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SOLUTION ===== -->
+  <section class="section" id="solution">
+    <div class="container">
+      <div class="solution-grid">
+        <div class="solution-visual reveal">
+          <div class="phone-mock">
+            <div class="phone-screen">
+              <div class="phone-header">
+                <div class="title">🏆 锐驰青少年壁球赛</div>
+                <div class="sub">AceCourt · 2026春季联赛</div>
+              </div>
+              <div class="phone-content">
+                <div style="background:var(--gray-50);border-radius:10px;padding:12px;margin-bottom:12px;">
+                  <div style="font-size:12px;font-weight:700;color:var(--gray-800);margin-bottom:8px;">📋 赛事信息</div>
+                  <div style="font-size:11px;color:var(--gray-600);line-height:1.8;">
+                    <div>📅 2026-05-15 ~ 05-17</div>
+                    <div>📍 广州市体育中心</div>
+                    <div>🏅 项目：青少年壁球 U10/U14</div>
+                    <div style="color:var(--orange);font-weight:700;margin-top:4px;">💰 报名费 ¥280</div>
+                  </div>
+                </div>
+                <div class="phone-card">
+                  <div class="row"><span>姓名</span><span>李明</span></div>
+                  <div class="row"><span>年龄</span><span>12 岁</span></div>
+                  <div class="row"><span>紧急联系人</span><span>138****8888</span></div>
+                  <div class="row"><span>参赛组别</span><span>U14 男子组</span></div>
+                </div>
+                <div class="phone-btn">✅ 已报名 · 查看电子凭证</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="solution-text reveal reveal-delay-2">
+          <div class="section-label">产品方案</div>
+          <h3>一个平台，搞定赛事全流程</h3>
+          <p>AceCourt 锐驰为办赛主体提供从发布赛事、收取报名费、管理报名名单到提现结算的完整闭环。</p>
+          <ul class="solution-features">
+            <li>
+              <span class="icon">1</span>
+              <div><strong>扫码即用</strong> — 运动员微信扫码，直接进入 H5 报名页，无需下载 App</div>
+            </li>
+            <li>
+              <span class="icon">2</span>
+              <div><strong>微信支付</strong> — 报名费直达平台商户账户，资金安全有保障</div>
+            </li>
+            <li>
+              <span class="icon">3</span>
+              <div><strong>电子凭证</strong> — 报名成功后自动生成二维码，入场核销一扫即用</div>
+            </li>
+            <li>
+              <span class="icon">4</span>
+              <div><strong>钱包系统</strong> — 主办方实时查看余额，一键提现到银行卡</div>
+            </li>
+            <li>
+              <span class="icon">5</span>
+              <div><strong>积分体系</strong> — 运动员积分累积与排行榜，激发持续参赛动力</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ROLES ===== -->
+  <section class="section roles" id="roles">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <div class="section-label" style="justify-content:center;">三端产品</div>
+        <h2 class="section-title">主办方 · 运动员 · 平台运营</h2>
+        <p class="section-subtitle" style="margin:0 auto;">每个角色都有专属的产品体验，各司其职，流畅协作。</p>
+      </div>
+      <div class="roles-grid">
+        <div class="role-card reveal reveal-delay-1">
+          <div class="role-header">
+            <div class="bg"></div>
+            <div class="content">
+              <div class="role-emoji">🏢</div>
+              <h3>主办方</h3>
+              <div class="role-sub">Organizer</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul class="role-list">
+              <li>手机号+验证码注册登录</li>
+              <li>创建赛事 &amp; 配置报名表单</li>
+              <li>生成报名二维码/小程序码</li>
+              <li>报名名单查看 + Excel 导出</li>
+              <li>钱包余额 + 发起提现</li>
+              <li>退款处理 + 消息通知</li>
+              <li>成绩上传 &amp; 发布</li>
+            </ul>
+          </div>
+        </div>
+        <div class="role-card reveal reveal-delay-2">
+          <div class="role-header">
+            <div class="bg" style="background:linear-gradient(135deg,#FF6B35,#D94F1E);"></div>
+            <div class="content">
+              <div class="role-emoji">🏃</div>
+              <h3>运动员</h3>
+              <div class="role-sub">Athlete</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul class="role-list">
+              <li>微信扫码直接进入报名页</li>
+              <li>填写报名表单（姓名/手机/组别）</li>
+              <li>微信支付报名费</li>
+              <li>电子凭证二维码（入场核销）</li>
+              <li>我的报名记录</li>
+              <li>成绩查询（姓名/号码）</li>
+              <li>积分排行榜</li>
+            </ul>
+          </div>
+        </div>
+        <div class="role-card reveal reveal-delay-3">
+          <div class="role-header">
+            <div class="bg" style="background:linear-gradient(135deg,#1A3A6B,#0F1C2E);"></div>
+            <div class="content">
+              <div class="role-emoji">🖥️</div>
+              <h3>平台运营</h3>
+              <div class="role-sub">Platform</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul class="role-list">
+              <li>主办方资质审核</li>
+              <li>赛事内容审核</li>
+              <li>提现审批</li>
+              <li>退款审批</li>
+              <li>VIP 套餐配置</li>
+              <li>基础数据看板</li>
+              <li>（GMV / 订单数）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FLOW ===== -->
+  <section class="section" id="flow">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <div class="section-label" style="justify-content:center;">用户旅程</div>
+        <h2 class="section-title">从扫码到完赛，六步搞定</h2>
+        <p class="section-subtitle" style="margin:0 auto;">完整闭环，覆盖办赛全生命周期</p>
+      </div>
+      <div class="flow-steps reveal">
+        <div class="flow-step">
+          <div class="flow-icon">📱</div>
+          <h4>扫码</h4>
+          <p>运动员微信扫码<br>进入 H5 报名页</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-icon">📝</div>
+          <h4>填表</h4>
+          <p>填写姓名/手机<br>选择参赛组别</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-icon">💳</div>
+          <h4>付款</h4>
+          <p>微信支付<br>报名费到平台账户</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-icon">🎫</div>
+          <h4>凭证</h4>
+          <p>自动生成<br>电子入场凭证</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-icon">🏅</div>
+          <h4>比赛</h4>
+          <p>现场扫码核销<br>比赛顺利进行</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-icon">💰</div>
+          <h4>结算</h4>
+          <p>成绩发布<br>主办方提现到账</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== REVENUE ===== -->
+  <section class="section revenue" id="revenue">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">盈利模式</div>
+        <h2 class="section-title">四种收入来源，持续增长</h2>
+        <p class="section-subtitle">以提现抽成为核心，VIP 会员费为支柱，增值服务与广告为补充。</p>
+      </div>
+      <div class="revenue-layout">
+        <div class="revenue-flow reveal">
+          <h3>💸 资金流向</h3>
+          <div class="flow-box">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 8v8m-4-4h8"/></svg>
+            运动员微信付款
+            <span class="arrow">→</span>
+          </div>
+          <div class="flow-box">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2m-2 0v-4"/></svg>
+            平台统一商户账户
+            <span class="arrow">→</span>
+          </div>
+          <div class="flow-box" style="flex-wrap:wrap;gap:8px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 110 8h-1"/></svg>
+            平台抽成 <span class="amount">5%</span>
+            <span class="arrow">→</span>
+            <span style="font-size:12px;color:var(--gray-600);">平台收入</span>
+          </div>
+          <div class="flow-box" style="flex-wrap:wrap;gap:8px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
+            剩余 <span class="amount" style="background:var(--blue);">95%</span>
+            <span class="arrow">→</span>
+            <span style="font-size:12px;color:var(--gray-600);">主办方钱包余额</span>
+          </div>
+          <div class="flow-box">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            主办方申请提现
+            <span class="arrow">→</span>
+            <span style="font-size:12px;color:var(--gray-600);">银行卡到账</span>
+          </div>
+        </div>
+        <div class="revenue-rules reveal reveal-delay-2">
+          <div class="rule-card">
+            <div class="rule-pct">5%</div>
+            <div class="rule-info">
+              <h4>非 VIP 主办方</h4>
+              <p>提现金额的 5% 作为平台服务费</p>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-pct" style="color:var(--blue);">3%</div>
+            <div class="rule-info">
+              <h4>认证机构（协会/学校）</h4>
+              <p>享受优惠抽成比例，扶持公益办赛</p>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-pct">0%</div>
+            <div class="rule-info">
+              <h4>VIP 免抽成额度内</h4>
+              <p>VIP 有效期内，每月免抽成额度内零手续费</p>
+            </div>
+          </div>
+          <div class="rule-card" style="background:linear-gradient(135deg,var(--gray-50),#fff);border-color:var(--orange);">
+            <div class="rule-pct">VIP</div>
+            <div class="rule-info">
+              <h4>会员费收入（占比 30%）</h4>
+              <p>季卡 ¥99 / 年卡 ¥299 / 旗舰卡 ¥599</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIP ===== -->
+  <section class="section" id="vip">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <div class="section-label" style="justify-content:center;">VIP 会员</div>
+        <h2 class="section-title">越用越划算的会员体系</h2>
+        <p class="section-subtitle" style="margin:0 auto;">按月免抽成额度、推荐位、认证徽章——帮主办方降本增效。</p>
+      </div>
+      <div class="vip-grid">
+        <div class="vip-card reveal reveal-delay-1">
+          <div class="vip-name">季卡</div>
+          <div class="vip-duration">90 天 · 自动续费</div>
+          <div class="vip-price">¥99 <span>/ 季</span></div>
+          <div class="vip-divider"></div>
+          <ul class="vip-benefits">
+            <li><span class="check">✓</span> 每月 ¥3,000 免抽成额度</li>
+            <li><span class="check">✓</span> 3 次推荐位曝光</li>
+            <li><span class="check">✓</span> 优先客服支持</li>
+            <li><span class="check">✓</span> 专属客服经理</li>
+          </ul>
+        </div>
+        <div class="vip-card featured reveal reveal-delay-2">
+          <div class="vip-name">年卡</div>
+          <div class="vip-duration">365 天 · 推荐首选</div>
+          <div class="vip-price">¥299 <span>/ 年</span></div>
+          <div class="vip-divider"></div>
+          <ul class="vip-benefits">
+            <li><span class="check">✓</span> 每月 ¥5,000 免抽成额度</li>
+            <li><span class="check">✓</span> 12 次推荐位曝光</li>
+            <li><span class="check">✓</span> 认证主办方徽章</li>
+            <li><span class="check">✓</span> 优先客服支持</li>
+            <li><span class="check">✓</span> 专属客服经理</li>
+          </ul>
+        </div>
+        <div class="vip-card reveal reveal-delay-3">
+          <div class="vip-name">旗舰卡</div>
+          <div class="vip-duration">365 天 · 顶级权益</div>
+          <div class="vip-price">¥599 <span>/ 年</span></div>
+          <div class="vip-divider"></div>
+          <ul class="vip-benefits">
+            <li><span class="check">✓</span> 每月 ¥10,000 免抽成额度</li>
+            <li><span class="check">✓</span> 无限推荐位曝光</li>
+            <li><span class="check">✓</span> 认证主办方徽章</li>
+            <li><span class="check">✓</span> 优先客服 + 专属客服</li>
+            <li><span class="check">✓</span> 新功能优先体验权</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ROADMAP ===== -->
+  <section class="section roadmap" id="roadmap">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">产品路线图</div>
+        <h2 class="section-title">五年国际化路径</h2>
+        <p class="section-subtitle">从壁球 MVP 开始，逐步扩展到多运动，走向东南亚。</p>
+      </div>
+      <div class="roadmap-timeline">
+        <div class="roadmap-item reveal">
+          <div class="roadmap-date">
+            <div class="ver">V1.0 MVP</div>
+            <div class="time">2026 Q2</div>
+          </div>
+          <div class="roadmap-dot"></div>
+          <div class="roadmap-content">
+            <h4>壁球赛事 MVP · 建立基础</h4>
+            <div class="roadmap-tags">
+              <span class="roadmap-tag highlight">运动员端 H5</span>
+              <span class="roadmap-tag highlight">主办方端</span>
+              <span class="roadmap-tag">微信支付</span>
+              <span class="roadmap-tag">钱包系统</span>
+              <span class="roadmap-tag">基础积分</span>
+              <span class="roadmap-tag">VIP 季卡/年卡</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item reveal">
+          <div class="roadmap-date">
+            <div class="ver">V1.1</div>
+            <div class="time">2026 Q3~Q4</div>
+          </div>
+          <div class="roadmap-dot"></div>
+          <div class="roadmap-content">
+            <h4>多运动扩展 · 功能深化</h4>
+            <div class="roadmap-tags">
+              <span class="roadmap-tag highlight">退款规则自定义</span>
+              <span class="roadmap-tag highlight">成绩批量上传</span>
+              <span class="roadmap-tag">赛季/联赛模式</span>
+              <span class="roadmap-tag">主办方等级体系</span>
+              <span class="roadmap-tag">微信小程序运动员端</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item reveal">
+          <div class="roadmap-date">
+            <div class="ver">V1.2</div>
+            <div class="time">2027 Q1~Q2</div>
+          </div>
+          <div class="roadmap-dot"></div>
+          <div class="roadmap-content">
+            <h4>完整积分 · 团队报名 · 多档位定价</h4>
+            <div class="roadmap-tags">
+              <span class="roadmap-tag highlight">完整 ELO 积分系统</span>
+              <span class="roadmap-tag highlight">电子证书生成</span>
+              <span class="roadmap-tag">团队报名模式</span>
+              <span class="roadmap-tag">早鸟/标准/VIP 多档位</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item reveal">
+          <div class="roadmap-date">
+            <div class="ver">V2.0</div>
+            <div class="time">2027 H2~</div>
+          </div>
+          <div class="roadmap-dot"></div>
+          <div class="roadmap-content">
+            <h4>国际化 · 开放生态</h4>
+            <div class="roadmap-tags">
+              <span class="roadmap-tag highlight">英语 + 东南亚本地化</span>
+              <span class="roadmap-tag">Stripe 国际支付</span>
+              <span class="roadmap-tag">开放 API</span>
+              <span class="roadmap-tag">直播/成绩大屏</span>
+              <span class="roadmap-tag">多语言 i18n</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta-section" id="cta">
+    <div class="container content">
+      <h2>准备好开始了吗？</h2>
+      <p>加入 AceCourt 锐驰首批内测名单，成为亚太青少年赛事革命的先行者。</p>
+      <div class="cta-actions">
+        <button class="btn btn-white" onclick="alert('内测申请已提交！我们会尽快联系你。')">
+          🏆 申请主办方内测
+        </button>
+        <button class="btn btn-ghost" onclick="alert('运动员端将在 MVP 发布后开放体验。')">
+          🤝 成为种子运动员
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+              <rect width="36" height="36" rx="10" fill="#FF6B35"/>
+              <path d="M18 6L26 28H10L18 6Z" fill="white"/>
+              <path d="M18 12L22 24H14L18 12Z" fill="#FF6B35"/>
+              <rect x="12" y="26" width="12" height="3" rx="1.5" fill="white"/>
+            </svg>
+            AceCourt 锐驰
+          </div>
+          <p>青少年多运动赛事一站式平台。<br>报名 · 支付 · 积分三位一体。</p>
+        </div>
+        <div class="footer-links">
+          <h5>产品</h5>
+          <ul>
+            <li><a href="#solution">产品方案</a></li>
+            <li><a href="#roles">三端概览</a></li>
+            <li><a href="#vip">VIP 会员</a></li>
+            <li><a href="#roadmap">路线图</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h5>开发</h5>
+          <ul>
+            <li><a href="#">技术架构</a></li>
+            <li><a href="#">接口文档</a></li>
+            <li><a href="#">数据库设计</a></li>
+            <li><a href="#">PRD 详情</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h5>联系</h5>
+          <ul>
+            <li><a href="#">商务合作</a></li>
+            <li><a href="#">技术支持</a></li>
+            <li><a href="#">反馈建议</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        © 2026 AceCourt 锐驰 · 亚太版 Club Locker · All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ===== PARTICLES =====
+    const colors = ['#FF6B35', '#FFD23F', '#2A5298', 'rgba(255,255,255,0.3)'];
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 6 + 2;
+      p.style.cssText = `
+        width:${size}px;height:${size}px;
+        left:${Math.random()*100}%;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        animation-duration:${Math.random()*12+8}s;
+        animation-delay:${Math.random()*8}s;
+        opacity:${Math.random()*0.5+0.1};
+      `;
+      container.appendChild(p);
+    }
+
+    // ===== SCROLL REVEAL =====
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+
+    // ===== NAV SCROLL =====
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    // ===== MOBILE NAV =====
+    function toggleNav() {
+      document.getElementById('navOverlay').classList.toggle('active');
+    }
+
+    // ===== SMOOTH SCROLL =====
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          const offset = 64;
+          const top = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1244,8 +1244,6 @@
       <div class="recommend-tags" id="recommendTags">
         <div class="recommend-tag active" onclick="selectRecommendTag(this, '全部')">全部</div>
         <div class="recommend-tag" onclick="selectRecommendTag(this, '壁球')">🏐 壁球</div>
-        <div class="recommend-tag" onclick="selectRecommendTag(this, '网球')">🎾 网球</div>
-        <div class="recommend-tag" onclick="selectRecommendTag(this, '游泳')">🏊 游泳</div>
         <div class="recommend-tag" onclick="selectRecommendTag(this, 'U14')">👤 U14</div>
         <div class="recommend-tag" onclick="selectRecommendTag(this, '北京')">📍 北京</div>
       </div>
@@ -1255,12 +1253,7 @@
     <div class="category-scroll" id="categoryScroll">
       <div class="category-tag active" onclick="selectCategory(this, '全部')">全部</div>
       <div class="category-tag" onclick="selectCategory(this, '壁球')">🏐 壁球</div>
-      <div class="category-tag" onclick="selectCategory(this, '网球')">🎾 网球</div>
-      <div class="category-tag" onclick="selectCategory(this, '羽毛球')">🏸 羽毛球</div>
-      <div class="category-tag" onclick="selectCategory(this, '游泳')">🏊 游泳</div>
-      <div class="category-tag" onclick="selectCategory(this, '篮球')">🏀 篮球</div>
-      <div class="category-tag" onclick="selectCategory(this, '足球')">⚽ 足球</div>
-    </div>
+      </div>
 
     <!-- 赛事列表 -->
     <div class="event-list" id="eventList">
@@ -1350,10 +1343,10 @@
         <span class="status-tag status-followed">已订阅</span>
       </div>
       <div class="subscription-card">
-        <div class="subscription-cover">🎾</div>
+        <div class="subscription-cover">🏐</div>
         <div class="subscription-info">
-          <div class="subscription-title">青少年网球公开赛</div>
-          <div class="subscription-meta">上海网球中心 · 5月22日</div>
+          <div class="subscription-title">青少年壁球公开赛</div>
+          <div class="subscription-meta">上海壁球中心</div>
         </div>
         <span class="status-tag status-followed">已订阅</span>
       </div>
@@ -1481,12 +1474,6 @@
         <div class="preference-title">🏐 感兴趣的运动（可多选）</div>
         <div class="preference-options" id="sportsPrefs">
           <div class="preference-chip" onclick="toggleChip(this)">壁球</div>
-          <div class="preference-chip selected" onclick="toggleChip(this)">网球</div>
-          <div class="preference-chip" onclick="toggleChip(this)">羽毛球</div>
-          <div class="preference-chip selected" onclick="toggleChip(this)">游泳</div>
-          <div class="preference-chip" onclick="toggleChip(this)">篮球</div>
-          <div class="preference-chip" onclick="toggleChip(this)">足球</div>
-          <div class="preference-chip" onclick="toggleChip(this)">乒乓球</div>
           <div class="preference-chip" onclick="toggleChip(this)">跆拳道</div>
         </div>
       </div>
@@ -1638,12 +1625,6 @@
         <div class="preference-group-title">🏐 感兴趣的运动</div>
         <div class="preference-options">
           <div class="preference-chip selected" onclick="toggleChip(this)">壁球</div>
-          <div class="preference-chip" onclick="toggleChip(this)">网球</div>
-          <div class="preference-chip" onclick="toggleChip(this)">羽毛球</div>
-          <div class="preference-chip selected" onclick="toggleChip(this)">游泳</div>
-          <div class="preference-chip" onclick="toggleChip(this)">篮球</div>
-          <div class="preference-chip" onclick="toggleChip(this)">足球</div>
-          <div class="preference-chip" onclick="toggleChip(this)">乒乓球</div>
           <div class="preference-chip" onclick="toggleChip(this)">跆拳道</div>
         </div>
       </div>
@@ -1737,10 +1718,10 @@
       </div>
 
       <div class="subscription-card">
-        <div class="subscription-cover">🎾</div>
+        <div class="subscription-cover">🏐</div>
         <div class="subscription-info">
-          <div class="subscription-title">青少年网球公开赛</div>
-          <div class="subscription-meta">上海网球中心 · 5月22日</div>
+          <div class="subscription-title">青少年壁球公开赛</div>
+          <div class="subscription-meta">上海壁球中心</div>
         </div>
         <div class="subscription-action" onclick="unsubscribe(this)">取消订阅</div>
       </div>
@@ -2263,103 +2244,11 @@
     },
     {
       id: 2,
-      title: '青少年网球公开赛',
-      type: '网球',
+      title: '青少年壁球公开赛',
+      type: '壁球',
       emoji: '🎾',
       date: '2026-05-22',
-      venue: '上海网球中心',
-      price: 520,
-      slots: 45,
-      maxSlots: 100,
-      status: 'open',
-      organizer: '上海市网球协会'
-    },
-    {
-      id: 3,
-      title: '青少年游泳达标赛',
-      type: '游泳',
-      emoji: '🏊',
-      date: '2026-06-01',
-      venue: '广州奥体中心游泳馆',
-      price: 280,
-      slots: 120,
-      maxSlots: 150,
-      status: 'open',
-      organizer: '广东省游泳协会'
-    },
-    {
-      id: 4,
-      title: '青少年羽毛球积分赛',
-      type: '羽毛球',
-      emoji: '🏸',
-      date: '2026-06-08',
-      venue: '深圳体育中心',
-      price: 350,
-      slots: 80,
-      maxSlots: 80,
-      status: 'full',
-      organizer: '深圳市羽毛球协会'
-    },
-    {
-      id: 5,
-      title: '青少年篮球邀请赛',
-      type: '篮球',
-      emoji: '🏀',
-      date: '2026-04-10',
-      venue: '成都青少年体育中心',
-      price: 450,
-      slots: 64,
-      maxSlots: 64,
-      status: 'ended',
-      organizer: '四川省篮球协会'
-    }
-  ];
-
-  // 报名记录数据
-  const records = [
-    {
-      id: 1,
-      title: '2026青少年壁球锦标赛',
-      emoji: '🏐',
-      date: '2026-05-15',
-      venue: '北京体育中心壁球馆',
-      group: 'U14 少年组',
-      fee: 380,
-      status: 'upcoming',
-      statusText: '即将开始'
-    },
-    {
-      id: 2,
-      title: '青少年网球公开赛',
-      emoji: '🎾',
-      date: '2026-05-22',
-      venue: '上海网球中心',
-      group: 'U18 青年组',
-      fee: 520,
-      status: 'paid',
-      statusText: '已支付'
-    },
-    {
-      id: 3,
-      title: '青少年游泳达标赛',
-      emoji: '🏊',
-      date: '2026-03-15',
-      venue: '广州奥体中心',
-      group: 'U14 少年组',
-      fee: 280,
-      status: 'completed',
-      statusText: '已完成'
-    }
-  ];
-
-  // 渲染赛事列表
-  function renderEvents(filter) {
-    filter = filter || '全部';
-    const list = document.getElementById('eventList');
-    const filtered = filter === '全部' ? events : events.filter(e => e.type === filter);
-    
-    list.innerHTML = filtered.map(event => `
-      <div class="event-card" onclick="showEventDetail(${event.id})">
+      venue: '上海壁球中心<div class="event-card" onclick="showEventDetail(${event.id})">
         <div class="event-cover" style="background: linear-gradient(135deg, ${getGradient(event.type)});">
           <span>${event.emoji}</span>
           <div class="event-type-badge">🏆 ${event.type}</div>
@@ -2406,12 +2295,7 @@
   function getGradient(type) {
     var gradients = {
       '壁球': '#1a1a3e, #2d1b4e',
-      '网球': '#1a2e1a, #1e3d1e',
-      '游泳': '#1a2e3e, #1a3d4d',
-      '羽毛球': '#3e1a1a, #4d1e1e',
-      '篮球': '#3e2e1a, #4d3d1e',
-      '足球': '#1a3e2e, #1e4d3d'
-    };
+      };
     return gradients[type] || '#1a1a3e, #2d1b4e';
   }
 

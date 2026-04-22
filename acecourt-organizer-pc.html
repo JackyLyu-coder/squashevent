@@ -683,7 +683,7 @@
               <span style="font-size:18px;">💸</span>
               <div style="flex:1;">
                 <div style="font-size:12px;font-weight:600;">2 个退款申请待处理</div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">来自青少年壁球赛 ×1，网球积分赛 ×1</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">来自青少年壁球赛 ×2</div>
               </div>
               <button class="btn btn-sm btn-outline" onclick="navigate('refunds')">处理</button>
             </div>
@@ -698,7 +698,7 @@
             <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(16,185,129,0.08);border-radius:8px;border-left:3px solid var(--success);">
               <span style="font-size:18px;">✅</span>
               <div style="flex:1;">
-                <div style="font-size:12px;font-weight:600;">网球积分赛 审核已通过</div>
+                <div style="font-size:12px;font-weight:600;">青少年壁球锦标赛 审核已通过</div>
                 <div style="font-size:11px;color:var(--success);margin-top:2px;">平台审核通过，赛事已上线</div>
               </div>
             </div>
@@ -738,9 +738,6 @@
         <select class="form-input" style="width:140px;">
           <option>全部类型</option>
           <option>壁球</option>
-          <option>网球</option>
-          <option>羽毛球</option>
-          <option>篮球</option>
         </select>
       </div>
       <div class="table-wrap">
@@ -769,8 +766,8 @@
               </td>
             </tr>
             <tr>
-              <td><div style="font-weight:600;">春季网球积分赛</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">ID: #ACE2026031</div></td>
-              <td><span class="tag">网球</span></td>
+              <td><div style="font-weight:600;">春季青少年壁球积分赛</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">ID: #ACE2026031</div></td>
+              <td><span class="tag">壁球</span></td>
               <td><div style="font-size:12px;">2026-05-10</div><div style="font-size:11px;color:var(--text-muted);">报名截止 5-05</div></td>
               <td><div style="font-size:13px;font-weight:600;">18<span style="color:var(--text-muted);font-weight:400;"> / 40</span></div><div class="progress-bar" style="margin-top:4px;width:80px;"><div class="progress-fill" style="width:45%;"></div></div></td>
               <td><span class="status-tag status-active">● 报名中</span></td>
@@ -780,8 +777,8 @@
               </td>
             </tr>
             <tr>
-              <td><div style="font-weight:600;">周末羽毛球友谊赛</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">ID: #ACE2026025</div></td>
-              <td><span class="tag">羽毛球</span></td>
+              <td><div style="font-weight:600;">壁球友谊邀请赛</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">ID: #ACE2026025</div></td>
+              <td><span class="tag">壁球</span></td>
               <td><div style="font-size:12px;">2026-04-05</div><div style="font-size:11px;color:var(--text-muted);">已结束</div></td>
               <td><div style="font-size:13px;font-weight:600;">45<span style="color:var(--text-muted);font-weight:400;"> / 50</span></div></td>
               <td><span class="status-tag status-draft">● 已结束</span></td>
@@ -791,8 +788,8 @@
               </td>
             </tr>
             <tr>
-              <td><div style="font-weight:600;">青少年篮球邀请赛</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">ID: #ACE2026032</div></td>
-              <td><span class="tag">篮球</span></td>
+              <td><div style="font-weight:600;">青少年壁球精英赛</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">ID: #ACE2026032</div></td>
+              <td><span class="tag">壁球</span></td>
               <td><div style="font-size:12px;">2026-06-01</div><div style="font-size:11px;color:var(--text-muted);">报名截止 5-25</div></td>
               <td><div style="font-size:13px;font-weight:600;">0<span style="color:var(--text-muted);font-weight:400;"> / 80</span></div><div class="progress-bar" style="margin-top:4px;width:80px;"><div class="progress-fill" style="width:0%;"></div></div></td>
               <td><span class="status-tag status-pending">● 待发布</span></td>
@@ -835,13 +832,6 @@
               <label class="form-label">赛事类型 <span>*</span></label>
               <select class="form-input">
                 <option value="squash">🏐 壁球</option>
-                <option value="tennis">🎾 网球</option>
-                <option value="badminton">🏸 羽毛球</option>
-                <option value="basketball">🏀 篮球</option>
-                <option value="football">⚽ 足球</option>
-                <option value="swimming">🏊 游泳</option>
-                <option value="table_tennis">🏓 乒乓球</option>
-                <option value="golf">⛳ 高尔夫</option>
               </select>
             </div>
           </div>
@@ -1038,9 +1028,6 @@
             <label class="form-label">💡 快速创建模板</label>
             <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;">
               <button class="btn btn-sm btn-outline" onclick="applyTemplate('squash')" style="background:rgba(99,102,241,0.1);">🏐 壁球青少年模板</button>
-              <button class="btn btn-sm btn-outline" onclick="applyTemplate('tennis')" style="background:rgba(99,102,241,0.1);">🎾 网球青少年模板</button>
-              <button class="btn btn-sm btn-outline" onclick="applyTemplate('badminton')" style="background:rgba(99,102,241,0.1);">🏸 羽毛球模板</button>
-              <button class="btn btn-sm btn-outline" onclick="applyTemplate('basketball')" style="background:rgba(99,102,241,0.1);">🏀 篮球模板</button>
               <button class="btn btn-sm btn-ghost" onclick="clearAllGroups()">🗑️ 清空全部</button>
             </div>
           </div>
@@ -1711,7 +1698,7 @@
             <div style="font-size:11px;color:var(--text-muted);">04-19 11:05</div>
           </div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
-            赛事：<span style="color:var(--text);">春季网球积分赛</span>　｜　金额：<span style="color:var(--success);font-weight:600;">¥100</span>　｜　支付方式：微信支付
+            赛事：<span style="color:var(--text);">春季青少年壁球积分赛</span>　｜　金额：<span style="color:var(--success);font-weight:600;">¥100</span>　｜　支付方式：微信支付
           </div>
           <div style="font-size:12px;background:rgba(245,158,11,0.08);border-radius:6px;padding:10px;margin-bottom:12px;border-left:3px solid var(--accent);">
             退款原因：报名时选错了年龄组，希望能改到 U12 组别，或者退款重新报名。
@@ -2273,22 +2260,22 @@
       icon: '🏆'
     },
     'ace2026031': {
-      name: '春季网球积分赛',
-      type: '网球', id: '#ACE2026031',
+      name: '春季青少年壁球积分赛',
+      type: '壁球', id: '#ACE2026031',
       status: '● 报名中', statusClass: 'status-active',
       enrolled: 18, max: 40,
       income: '¥1,800',
       progress: 45,
       createTime: '04-10',
       matchTime: '2026-05-10（周日）08:00-17:00',
-      location: '上海网球中心（闵行区）',
+      location: '上海壁球中心（闵行区）',
       deadline: '2026-05-05 23:59',
       groups: 'U10/U12/U14/U16（4组）',
-      icon: '🎾'
+      icon: '🏐'
     },
     'ace2026025': {
-      name: '周末羽毛球友谊赛',
-      type: '羽毛球', id: '#ACE2026025',
+      name: '壁球友谊邀请赛',
+      type: '壁球', id: '#ACE2026025',
       status: '● 已结束', statusClass: 'status-draft',
       enrolled: 45, max: 50,
       income: '¥6,750',
@@ -2298,18 +2285,18 @@
       location: '上海体育馆（静安区）',
       deadline: '2026-04-01 23:59',
       groups: 'U11/U13/U15/竞赛组（4组）',
-      icon: '🏸'
+      icon: '🏐'
     },
     'ace2026032': {
-      name: '青少年篮球邀请赛',
-      type: '篮球', id: '#ACE2026032',
+      name: '青少年壁球精英赛',
+      type: '壁球', id: '#ACE2026032',
       status: '● 待发布', statusClass: 'status-pending',
       enrolled: 0, max: 80,
       income: '—',
       progress: 0,
       createTime: '04-15',
       matchTime: '2026-06-01（周日）10:00-18:00',
-      location: '上海体育馆篮球馆（浦东新区）',
+      location: '上海壁球馆（浦东新区）',
       deadline: '2026-05-25 23:59',
       groups: 'U10/U12/U14/U16/U18（5组）',
       icon: '🏀'
@@ -2569,52 +2556,6 @@
         { name:'U17 女',  ageMin:14, ageMax:17, gender:'女',  max:16, fee:200 },
         { name:'U19 男',  ageMin:17, ageMax:19, gender:'男',  max:16, fee:200 },
         { name:'U19 女',  ageMin:17, ageMax:19, gender:'女',  max:16, fee:200 },
-      ],
-      // 网球：参考 ITF/CTA 青少年标准，U10~U18 + 公开成人组
-      tennis: [
-        { name:'U10 男',  ageMin:8,  ageMax:10, gender:'男',  max:24, fee:120 },
-        { name:'U10 女',  ageMin:8,  ageMax:10, gender:'女',  max:24, fee:120 },
-        { name:'U12 男',  ageMin:10, ageMax:12, gender:'男',  max:24, fee:120 },
-        { name:'U12 女',  ageMin:10, ageMax:12, gender:'女',  max:24, fee:120 },
-        { name:'U14 男',  ageMin:12, ageMax:14, gender:'男',  max:20, fee:150 },
-        { name:'U14 女',  ageMin:12, ageMax:14, gender:'女',  max:20, fee:150 },
-        { name:'U16 男',  ageMin:14, ageMax:16, gender:'男',  max:16, fee:180 },
-        { name:'U16 女',  ageMin:14, ageMax:16, gender:'女',  max:16, fee:180 },
-        { name:'U18 男',  ageMin:16, ageMax:18, gender:'男',  max:16, fee:200 },
-        { name:'U18 女',  ageMin:16, ageMax:18, gender:'女',  max:16, fee:200 },
-        { name:'公开组',  ageMin:18, ageMax:99, gender:'男',  max:24, fee:250 },
-        { name:'公开组',  ageMin:18, ageMax:99, gender:'女',  max:24, fee:250 },
-      ],
-      // 羽毛球：参考中国羽协青少年标准，U9~U17，增加竞赛组/初级组/公开组
-      badminton: [
-        { name:'U9 混合',  ageMin:7,  ageMax:9,  gender:'混合',max:24, fee:100 },
-        { name:'U11 男',  ageMin:9,  ageMax:11, gender:'男',  max:24, fee:120 },
-        { name:'U11 女',  ageMin:9,  ageMax:11, gender:'女',  max:24, fee:120 },
-        { name:'U13 男',  ageMin:11, ageMax:13, gender:'男',  max:20, fee:140 },
-        { name:'U13 女',  ageMin:11, ageMax:13, gender:'女',  max:20, fee:140 },
-        { name:'U15 男',  ageMin:13, ageMax:15, gender:'男',  max:20, fee:160 },
-        { name:'U15 女',  ageMin:13, ageMax:15, gender:'女',  max:20, fee:160 },
-        { name:'U17 男',  ageMin:15, ageMax:17, gender:'男',  max:16, fee:180 },
-        { name:'U17 女',  ageMin:15, ageMax:17, gender:'女',  max:16, fee:180 },
-        { name:'竞赛组',  ageMin:16, ageMax:45, gender:'男',  max:32, fee:220 },
-        { name:'竞赛组',  ageMin:16, ageMax:45, gender:'女',  max:32, fee:220 },
-        { name:'初级组',  ageMin:18, ageMax:65, gender:'男',  max:24, fee:180 },
-        { name:'初级组',  ageMin:18, ageMax:65, gender:'女',  max:24, fee:180 },
-      ],
-      // 篮球：参考中国篮协青少年标准，U6~U18，增加竞赛组/基础组/兴趣组
-      basketball: [
-        { name:'U6 兴趣组', ageMin:4,  ageMax:6,  gender:'混合',max:40, fee:150 },
-        { name:'U8 基础组', ageMin:6,  ageMax:8,  gender:'混合',max:40, fee:180 },
-        { name:'U10 竞赛组',ageMin:8,  ageMax:10, gender:'男',  max:32, fee:200 },
-        { name:'U10 竞赛组',ageMin:8,  ageMax:10, gender:'女',  max:32, fee:200 },
-        { name:'U12 竞赛组',ageMin:10, ageMax:12, gender:'男',  max:32, fee:220 },
-        { name:'U12 竞赛组',ageMin:10, ageMax:12, gender:'女',  max:32, fee:220 },
-        { name:'U14 竞赛组',ageMin:12, ageMax:14, gender:'男',  max:24, fee:250 },
-        { name:'U14 竞赛组',ageMin:12, ageMax:14, gender:'女',  max:24, fee:250 },
-        { name:'U16 竞赛组',ageMin:14, ageMax:16, gender:'男',  max:24, fee:280 },
-        { name:'U16 竞赛组',ageMin:14, ageMax:16, gender:'女',  max:24, fee:280 },
-        { name:'U18 竞赛组',ageMin:16, ageMax:18, gender:'男',  max:24, fee:300 },
-        { name:'U18 竞赛组',ageMin:16, ageMax:18, gender:'女',  max:24, fee:300 },
       ]
     };
     const tmpl = templates[type];
@@ -2622,7 +2563,7 @@
     groups = tmpl.map(t => ({ ...t, id: 'g' + Date.now() + Math.random() }));
     renderGroupList();
     updateGroupStats();
-    const names = { squash:'壁球青少年(U8~U19)', tennis:'网球青少年(U10~U18+公开)', badminton:'羽毛球(U9~竞赛+初级)', basketball:'篮球(U6~U18+兴趣+基础+竞赛)' };
+    const names = { squash:'壁球青少年(U8~U19)' };
     toast('已应用「' + (names[type] || type) + '」模板，共 ' + groups.length + ' 个组别', 'success');
   }
 

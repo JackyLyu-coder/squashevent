@@ -650,9 +650,9 @@
     font-size: 40px;
   }
   .event-cover.squash { background: linear-gradient(135deg, #1a1a3e, #2d1b4e); }
-  .event-cover.tennis { background: linear-gradient(135deg, #1a3e1a, #2d4d2d); }
+
   .event-cover.swim { background: linear-gradient(135deg, #1a3e3e, #2d4d4d); }
-  .event-cover.badminton { background: linear-gradient(135deg, #3e1a1a, #4d2d2d); }
+
   .event-body { padding: 14px; }
   .event-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .event-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; flex-direction: column; gap: 3px; }
@@ -1071,10 +1071,7 @@
         <div class="filter-bar">
           <span class="filter-tag active">全部</span>
           <span class="filter-tag" onclick="this.classList.toggle('active')">壁球</span>
-          <span class="filter-tag" onclick="this.classList.toggle('active')">网球</span>
-          <span class="filter-tag" onclick="this.classList.toggle('active')">游泳</span>
-          <span class="filter-tag" onclick="this.classList.toggle('active')">羽毛球</span>
-        </div>
+          </div>
         <div class="filter-bar" style="margin-top: -10px;">
           <span class="filter-tag active">全部城市</span>
           <span class="filter-tag" onclick="this.classList.toggle('active')">北京</span>
@@ -1099,11 +1096,11 @@
             </div>
           </div>
           <div class="event-card" onclick="openModal('eventDetailModal')">
-            <div class="event-cover tennis">🎾</div>
+            <div class="event-cover squash">🏐</div>
             <div class="event-body">
-              <div class="event-title">青少年网球公开赛</div>
+              <div class="event-title">青少年壁球公开赛</div>
               <div class="event-meta">
-                <div>📍 上海网球中心</div>
+                <div>📍 上海壁球中心</div>
                 <div>📅 2026-05-22 至 05-24</div>
               </div>
               <div class="event-tags">
@@ -1113,11 +1110,11 @@
             </div>
           </div>
           <div class="event-card" onclick="openModal('eventDetailModal')">
-            <div class="event-cover swim">🏊</div>
+            <div class="event-cover swim">🏐</div>
             <div class="event-body">
-              <div class="event-title">青少年游泳锦标赛</div>
+              <div class="event-title">青少年壁球锦标赛</div>
               <div class="event-meta">
-                <div>📍 广州游泳馆</div>
+                <div>📍 广州壁球馆</div>
                 <div>📅 2026-06-01 至 06-02</div>
               </div>
               <div class="event-tags">
@@ -1127,9 +1124,9 @@
             </div>
           </div>
           <div class="event-card" onclick="openModal('eventDetailModal')">
-            <div class="event-cover badminton">🏸</div>
+            <div class="event-cover squash">🏐</div>
             <div class="event-body">
-              <div class="event-title">青少年羽毛球积分赛</div>
+              <div class="event-title">青少年壁球积分赛</div>
               <div class="event-meta">
                 <div>📍 深圳体育中心</div>
                 <div>📅 2026-06-08 至 06-09</div>
@@ -1155,11 +1152,11 @@
             </div>
           </div>
           <div class="event-card" onclick="openModal('eventDetailModal')">
-            <div class="event-cover tennis">🎾</div>
+            <div class="event-cover squash">🏐</div>
             <div class="event-body">
-              <div class="event-title">青少年网球冠军赛</div>
+              <div class="event-title">青少年壁球冠军赛</div>
               <div class="event-meta">
-                <div>📍 杭州网球中心</div>
+                <div>📍 杭州壁球中心</div>
                 <div>📅 2026-07-01 至 07-05</div>
               </div>
               <div class="event-tags">
@@ -1223,8 +1220,8 @@
               <tr>
                 <td>
                   <div style="display: flex; align-items: center; gap: 8px;">
-                    <span>🎾</span>
-                    <span>青少年网球公开赛</span>
+                    <span>🏐</span>
+                    <span>青少年壁球公开赛</span>
                   </div>
                 </td>
                 <td>U14组</td>
@@ -1461,9 +1458,9 @@
           <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 11px;" onclick="this.textContent='已取消'; this.disabled=true;">取消订阅</button>
         </div>
         <div class="match-item" style="margin-bottom: 20px;">
-          <div class="match-icon" style="background: linear-gradient(135deg, #1a3e1a, #2d4d2d);">🎾</div>
+          <div class="match-icon" style="background: linear-gradient(135deg, #1a3e1a, #2d4d2d);">🏐</div>
           <div class="match-info">
-            <div class="match-title">青少年网球公开赛</div>
+            <div class="match-title">青少年壁球公开赛</div>
             <div class="match-meta">5月22日开赛</div>
           </div>
           <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 11px;" onclick="this.textContent='已取消'; this.disabled=true;">取消订阅</button>
@@ -1494,10 +1491,7 @@
           <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">🏐 感兴趣的运动</h4>
           <div class="filter-bar" style="margin: 0;">
             <span class="filter-tag active">壁球</span>
-            <span class="filter-tag" onclick="this.classList.toggle('active')">网球</span>
-            <span class="filter-tag" onclick="this.classList.toggle('active')">游泳</span>
-            <span class="filter-tag" onclick="this.classList.toggle('active')">羽毛球</span>
-          </div>
+            </div>
         </div>
         <div style="margin-bottom: 20px;">
           <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">📍 关注城市</h4>
